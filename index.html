@@ -1416,6 +1416,12 @@
           </div>
 
           <div class="field-wrap" style="margin-bottom: 12px;">
+            <label class="field-lbl">🔑 توکن اختصاصی API سنایی (API Token - ورود هوشمند بدون نیاز به رمز)</label>
+            <input class="inp-clean" id="snApiToken" value="PS9j4s3FcPs5Jd4dvotYep7KVHdRwBclabkPRCqEMZjBQQxs" placeholder="توکن API سنایی">
+            <div class="field-hint">توکن تولیدشده توسط پنل سنایی جهت احراز هویت مستقیم API بدون نیاز به نام کاربری و رمز عبور</div>
+          </div>
+
+          <div class="field-wrap" style="margin-bottom: 12px;">
             <label class="field-lbl">مسیر پایه وب‌پنل (WebBasePath / Secret URL)</label>
             <input class="inp-clean" id="snBasePath" value="WTy9cJKmxOphyIW78A" placeholder="مثلاً: WTy9cJKmxOphyIW78A">
             <div class="field-hint">مسیر مخفی آدرس URL پنل سنایی شما جهت جلوگیری از اسکن فایروال</div>
@@ -2239,18 +2245,20 @@ WantedBy=multi-user.target</pre>
   // Sanaei All-in-One Master API Controller
   async function loadSanaeiInboundsTable() {
     const host = document.getElementById('snHost').value.trim() || activeKharejIP;
-    const port = document.getElementById('snPort').value.trim() || 2053;
+    const port = document.getElementById('snPort').value.trim() || 53008;
+    const basePath = document.getElementById('snBasePath') ? document.getElementById('snBasePath').value.trim() : 'WTy9cJKmxOphyIW78A';
+    const apiToken = document.getElementById('snApiToken') ? document.getElementById('snApiToken').value.trim() : 'PS9j4s3FcPs5Jd4dvotYep7KVHdRwBclabkPRCqEMZjBQQxs';
     const username = document.getElementById('snUser').value.trim();
     const password = document.getElementById('snPass').value.trim();
     const tableBody = document.getElementById('snInboundsTableBody');
     const badge = document.getElementById('snInboundsCounterBadge');
     const statusBox = document.getElementById('apiStatusMessage');
 
-    if (!password) {
-      toast('لطفاً ابتدا رمز عبور پنل سنایی را وارد کنید');
+    if (!password && !apiToken) {
+      toast('لطفاً ابتدا رمز عبور یا API Token پنل سنایی را وارد کنید');
       if (statusBox) {
         statusBox.classList.remove('hide');
-        statusBox.innerHTML = '<span style="color:var(--danger); font-weight:700;">⚠️ خطا:</span> لطفاً رمز عبور پنل سنایی را وارد نمایید.';
+        statusBox.innerHTML = '<span style="color:var(--danger); font-weight:700;">⚠️ خطا:</span> لطفاً رمز عبور یا API Token سنایی را وارد نمایید.';
       }
       return;
     }
@@ -2261,7 +2269,7 @@ WantedBy=multi-user.target</pre>
       const res = await fetch('/api/sanaei/inbounds/list', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ host, port, username, password })
+        body: JSON.stringify({ host, port, basePath, apiToken, username, password })
       });
       const data = await res.json();
       if (data.ok && Array.isArray(data.inbounds)) {
@@ -2295,7 +2303,7 @@ WantedBy=multi-user.target</pre>
         }
 
         // Fetch hardware stats
-        loadSanaeiHardwareStatus(host, port, username, password);
+        loadSanaeiHardwareStatus(host, port, basePath, apiToken, username, password);
         toast('اطلاعات زنده اینباندها و سرور از سنایی بارگذاری شد!');
       } else {
         tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:18px; color:var(--danger);">خطا: ${data.error || 'عدم اتصال به پنل'}</td></tr>`;
@@ -2307,7 +2315,9 @@ WantedBy=multi-user.target</pre>
 
   async function toggleSanaeiInbound(inboundId, newEnable) {
     const host = document.getElementById('snHost').value.trim() || activeKharejIP;
-    const port = document.getElementById('snPort').value.trim() || 2053;
+    const port = document.getElementById('snPort').value.trim() || 53008;
+    const basePath = document.getElementById('snBasePath') ? document.getElementById('snBasePath').value.trim() : 'WTy9cJKmxOphyIW78A';
+    const apiToken = document.getElementById('snApiToken') ? document.getElementById('snApiToken').value.trim() : 'PS9j4s3FcPs5Jd4dvotYep7KVHdRwBclabkPRCqEMZjBQQxs';
     const username = document.getElementById('snUser').value.trim();
     const password = document.getElementById('snPass').value.trim();
 
@@ -2315,7 +2325,7 @@ WantedBy=multi-user.target</pre>
       const res = await fetch('/api/sanaei/inbounds/toggle', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ host, port, username, password, inboundId, enable: newEnable })
+        body: JSON.stringify({ host, port, basePath, apiToken, username, password, inboundId, enable: newEnable })
       });
       const data = await res.json();
       if (data.ok) {
@@ -2332,7 +2342,9 @@ WantedBy=multi-user.target</pre>
   async function deleteSanaeiInbound(inboundId, inboundPort) {
     if (!confirm(`آیا از حذف اینباند پورت ${inboundPort} (شناسه #${inboundId}) در پنل سنایی اطمینان دارید؟`)) return;
     const host = document.getElementById('snHost').value.trim() || activeKharejIP;
-    const port = document.getElementById('snPort').value.trim() || 2053;
+    const port = document.getElementById('snPort').value.trim() || 53008;
+    const basePath = document.getElementById('snBasePath') ? document.getElementById('snBasePath').value.trim() : 'WTy9cJKmxOphyIW78A';
+    const apiToken = document.getElementById('snApiToken') ? document.getElementById('snApiToken').value.trim() : 'PS9j4s3FcPs5Jd4dvotYep7KVHdRwBclabkPRCqEMZjBQQxs';
     const username = document.getElementById('snUser').value.trim();
     const password = document.getElementById('snPass').value.trim();
 
@@ -2340,7 +2352,7 @@ WantedBy=multi-user.target</pre>
       const res = await fetch('/api/sanaei/inbounds/delete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ host, port, username, password, inboundId })
+        body: JSON.stringify({ host, port, basePath, apiToken, username, password, inboundId })
       });
       const data = await res.json();
       if (data.ok) {
@@ -2357,7 +2369,9 @@ WantedBy=multi-user.target</pre>
   async function resetAllSanaeiTraffics() {
     if (!confirm('آیا از صفر کردن حجم مصرفی تمامی اینباندها در پنل سنایی اطمینان دارید؟')) return;
     const host = document.getElementById('snHost').value.trim() || activeKharejIP;
-    const port = document.getElementById('snPort').value.trim() || 2053;
+    const port = document.getElementById('snPort').value.trim() || 53008;
+    const basePath = document.getElementById('snBasePath') ? document.getElementById('snBasePath').value.trim() : 'WTy9cJKmxOphyIW78A';
+    const apiToken = document.getElementById('snApiToken') ? document.getElementById('snApiToken').value.trim() : 'PS9j4s3FcPs5Jd4dvotYep7KVHdRwBclabkPRCqEMZjBQQxs';
     const username = document.getElementById('snUser').value.trim();
     const password = document.getElementById('snPass').value.trim();
 
@@ -2365,7 +2379,7 @@ WantedBy=multi-user.target</pre>
       const res = await fetch('/api/sanaei/inbounds/reset-traffic', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ host, port, username, password })
+        body: JSON.stringify({ host, port, basePath, apiToken, username, password })
       });
       const data = await res.json();
       if (data.ok) {
@@ -2379,12 +2393,12 @@ WantedBy=multi-user.target</pre>
     }
   }
 
-  async function loadSanaeiHardwareStatus(host, port, username, password) {
+  async function loadSanaeiHardwareStatus(host, port, basePath, apiToken, username, password) {
     try {
       const res = await fetch('/api/sanaei/server/status', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ host, port, username, password })
+        body: JSON.stringify({ host, port, basePath, apiToken, username, password })
       });
       const data = await res.json();
       if (data.ok) {
@@ -2651,7 +2665,9 @@ WantedBy=multi-user.target</pre>
   // Batch Inbound Creation in Sanaei (All 7 Inbounds)
   document.getElementById('btnAutoCreateInbound').addEventListener('click', async () => {
     const host = document.getElementById('snHost').value.trim() || activeKharejIP;
-    const port = document.getElementById('snPort').value.trim() || 2053;
+    const port = document.getElementById('snPort').value.trim() || 53008;
+    const basePath = document.getElementById('snBasePath') ? document.getElementById('snBasePath').value.trim() : 'WTy9cJKmxOphyIW78A';
+    const apiToken = document.getElementById('snApiToken') ? document.getElementById('snApiToken').value.trim() : 'PS9j4s3FcPs5Jd4dvotYep7KVHdRwBclabkPRCqEMZjBQQxs';
     const username = document.getElementById('snUser').value.trim();
     const password = document.getElementById('snPass').value.trim();
     const statusBox = document.getElementById('apiStatusMessage');
@@ -2663,7 +2679,7 @@ WantedBy=multi-user.target</pre>
       const res = await fetch('/api/sanaei/create-multi-inbounds', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ host, port, username, password, iranIPv4: activeIranIP })
+        body: JSON.stringify({ host, port, basePath, apiToken, username, password, iranIPv4: activeIranIP })
       });
       const data = await res.json();
       if (data.ok) {

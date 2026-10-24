@@ -627,13 +627,35 @@ app.get('/api/scripts/all', (req, res) => {
 // Performs authentic HTTP calls to 3x-ui web panel, cookie management, and error handling
 // =============================================================================
 
+// Helper to construct request headers for Sanaei API (Supports Session Cookie AND/OR API Token)
+function getSanaeiHeaders(opts, sessionCookie = '') {
+  const token = (opts.apiToken || opts.token || opts.apiKey || '').trim();
+  const headers = { 'Accept': 'application/json' };
+  const activeCookie = sessionCookie || opts.sessionCookie || '';
+
+  if (activeCookie) {
+    headers['Cookie'] = `3x-ui=${activeCookie}`;
+  }
+  if (token) {
+    headers['Token'] = token;
+    headers['Api-Token'] = token;
+    headers['Authorization'] = `Bearer ${token}`;
+    if (!activeCookie) {
+      headers['Cookie'] = `3x-ui=${token}`;
+    }
+  }
+  return headers;
+}
+
 /**
- * Live Connection & Credentials Test against Sanaei Panel
+ * Live Connection & Credentials / API Token Test against Sanaei Panel
  */
 app.post('/api/sanaei/test-connection', async (req, res) => {
-  const { host = CONFIG_STORE.kharejIP, port = 2053, basePath = '', username = 'admin', password } = req.body;
-  if (!password) {
-    return res.status(400).json({ ok: false, error: 'رمز عبور پنل سنایی الزامی است' });
+  const { host = CONFIG_STORE.kharejIP, port = 2053, basePath = '', username = 'admin', password = '', apiToken = '', token = '' } = req.body;
+  const activeToken = (apiToken || token || '').trim();
+
+  if (!password && !activeToken) {
+    return res.status(400).json({ ok: false, error: 'رمز عبور یا توکن اختصاصی API سنایی الزامی است' });
   }
 
   const cleanBasePath = basePath ? (basePath.startsWith('/') ? basePath : '/' + basePath) : '';
@@ -643,64 +665,106 @@ app.post('/api/sanaei/test-connection', async (req, res) => {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 4500);
 
-    const formParams = new URLSearchParams();
-    formParams.append('username', username);
-    formParams.append('password', password);
+    let sessionCookie = '';
+    let authenticated = false;
 
-    const response = await fetch(loginUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: formParams,
-      signal: controller.signal
-    });
-    clearTimeout(timeout);
-
-    const data = await response.json().catch(() => ({}));
-    const rawCookies = response.headers.get('set-cookie') || '';
-    const sessionMatch = rawCookies.match(/3x-ui=([^;]+)/);
-    const sessionCookie = sessionMatch ? sessionMatch[1] : '';
-
-    if (data.success || sessionCookie) {
-      addLog(`[SANAEI API] Authentication successful for ${username} at ${host}:${port}`);
-
-      // Try querying inbounds list to verify full read/write permissions
-      let inbounds = [];
+    // 1. Try Token Authentication if Token provided
+    if (activeToken) {
       try {
         const listRes = await fetch(`http://${host}:${port}${cleanBasePath}/panel/api/inbounds/list`, {
-          headers: { 'Cookie': `3x-ui=${sessionCookie}` },
-          signal: AbortSignal.timeout(3000)
+          headers: getSanaeiHeaders(req.body, activeToken),
+          signal: AbortSignal.timeout(3500)
         });
         const listData = await listRes.json().catch(() => ({}));
         if (listData.success && Array.isArray(listData.obj)) {
-          inbounds = listData.obj.map(item => ({
-            id: item.id,
-            tag: item.tag || item.remark,
-            port: item.port,
-            protocol: item.protocol,
-            enable: item.enable
-          }));
+          authenticated = true;
+          sessionCookie = activeToken;
+          addLog(`[SANAEI API] API Token authentication successful at ${host}:${port}`);
+          return res.json({
+            ok: true,
+            connected: true,
+            authenticated: true,
+            authMethod: 'API Token',
+            host,
+            port,
+            sessionCookie,
+            inboundsCount: listData.obj.length,
+            inbounds: listData.obj.map(item => ({
+              id: item.id,
+              tag: item.tag || item.remark,
+              port: item.port,
+              protocol: item.protocol,
+              enable: item.enable
+            })),
+            message: `اتصال و احراز هویت هوشمند با API Token سنایی در ${host}:${port} با موفقیت تایید شد!`
+          });
         }
       } catch (e) {}
-
-      return res.json({
-        ok: true,
-        connected: true,
-        authenticated: true,
-        host,
-        port,
-        sessionCookie,
-        inboundsCount: inbounds.length,
-        inbounds,
-        message: `اتصال و احراز هویت با پنل سنایی در ${host}:${port} با موفقیت انجام شد!`
-      });
-    } else {
-      return res.json({
-        ok: false,
-        connected: true,
-        authenticated: false,
-        error: data.msg || 'نام کاربری یا رمز عبور پنل سنایی اشتباه است'
-      });
     }
+
+    // 2. Fallback to Username & Password Authentication
+    if (password) {
+      const formParams = new URLSearchParams();
+      formParams.append('username', username);
+      formParams.append('password', password);
+
+      const response = await fetch(loginUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: formParams,
+        signal: controller.signal
+      });
+      clearTimeout(timeout);
+
+      const data = await response.json().catch(() => ({}));
+      const rawCookies = response.headers.get('set-cookie') || '';
+      const sessionMatch = rawCookies.match(/3x-ui=([^;]+)/);
+      sessionCookie = sessionMatch ? sessionMatch[1] : '';
+
+      if (data.success || sessionCookie) {
+        authenticated = true;
+        addLog(`[SANAEI API] Password authentication successful for ${username} at ${host}:${port}`);
+
+        let inbounds = [];
+        try {
+          const listRes = await fetch(`http://${host}:${port}${cleanBasePath}/panel/api/inbounds/list`, {
+            headers: getSanaeiHeaders(req.body, sessionCookie),
+            signal: AbortSignal.timeout(3000)
+          });
+          const listData = await listRes.json().catch(() => ({}));
+          if (listData.success && Array.isArray(listData.obj)) {
+            inbounds = listData.obj.map(item => ({
+              id: item.id,
+              tag: item.tag || item.remark,
+              port: item.port,
+              protocol: item.protocol,
+              enable: item.enable
+            }));
+          }
+        } catch (e) {}
+
+        return res.json({
+          ok: true,
+          connected: true,
+          authenticated: true,
+          authMethod: 'Username/Password',
+          host,
+          port,
+          sessionCookie,
+          inboundsCount: inbounds.length,
+          inbounds,
+          message: `اتصال و احراز هویت با پنل سنایی در ${host}:${port} با موفقیت انجام شد!`
+        });
+      }
+    }
+
+    return res.json({
+      ok: false,
+      connected: true,
+      authenticated: false,
+      error: 'احراز هویت ناموفق بود: API Token یا رمز عبور اشتباه است'
+    });
+
   } catch (err) {
     const isTimeout = err.name === 'AbortError';
     const errMsg = isTimeout
@@ -718,9 +782,12 @@ app.post('/api/sanaei/test-connection', async (req, res) => {
 });
 
 app.post('/api/sanaei/login', async (req, res) => {
-  const { host = CONFIG_STORE.kharejIP, port = 2053, basePath = '', username = 'admin', password } = req.body;
+  const { host = CONFIG_STORE.kharejIP, port = 2053, basePath = '', username = 'admin', password, apiToken = '' } = req.body;
+  if (apiToken) {
+    return res.json({ ok: true, sessionCookie: apiToken, message: 'ورود موفق با API Token سنایی' });
+  }
   if (!password) {
-    return res.status(400).json({ ok: false, error: 'رمز عبور پنل سنایی الزامی است' });
+    return res.status(400).json({ ok: false, error: 'رمز عبور یا API Token سنایی الزامی است' });
   }
 
   const cleanBasePath = basePath ? (basePath.startsWith('/') ? basePath : '/' + basePath) : '';
@@ -762,11 +829,14 @@ app.post('/api/sanaei/login', async (req, res) => {
   }
 });
 
-// Helper to authenticate with Sanaei and return sessionCookie
+// Helper to authenticate with Sanaei and return sessionCookie or Token
 async function resolveSanaeiCookie(opts) {
-  const { host = CONFIG_STORE.kharejIP, port = 2053, basePath = '', username = 'admin', password = '', sessionCookie = '' } = opts;
+  const { host = CONFIG_STORE.kharejIP, port = 2053, basePath = '', username = 'admin', password = '', sessionCookie = '', apiToken = '', token = '' } = opts;
+  const activeToken = (apiToken || token || '').trim();
+  if (activeToken) return activeToken;
   if (sessionCookie) return sessionCookie;
   if (!password) return null;
+
   const cleanBasePath = basePath ? (basePath.startsWith('/') ? basePath : '/' + basePath) : '';
   try {
     const loginUrl = `http://${host}:${port}${cleanBasePath}/login`;
@@ -795,13 +865,13 @@ app.post('/api/sanaei/inbounds/list', async (req, res) => {
   const cleanBasePath = basePath ? (basePath.startsWith('/') ? basePath : '/' + basePath) : '';
   const cookie = await resolveSanaeiCookie(req.body);
   if (!cookie) {
-    return res.status(401).json({ ok: false, error: 'برای دریافت لیست اینباندها رمز عبور پنل سنایی را وارد نمایید' });
+    return res.status(401).json({ ok: false, error: 'برای دریافت لیست اینباندها API Token یا رمز عبور پنل سنایی را وارد نمایید' });
   }
 
   try {
     const listUrl = `http://${host}:${port}${cleanBasePath}/panel/api/inbounds/list`;
     const response = await fetch(listUrl, {
-      headers: { 'Cookie': `3x-ui=${cookie}` },
+      headers: getSanaeiHeaders(req.body, cookie),
       signal: AbortSignal.timeout(4000)
     });
     const data = await response.json().catch(() => ({}));
@@ -862,7 +932,7 @@ app.post('/api/sanaei/inbounds/toggle', async (req, res) => {
     // 1. Fetch current inbound data
     const getUrl = `http://${host}:${port}${cleanBasePath}/panel/api/inbounds/get/${inboundId}`;
     const getRes = await fetch(getUrl, {
-      headers: { 'Cookie': `3x-ui=${cookie}` },
+      headers: getSanaeiHeaders(req.body, cookie),
       signal: AbortSignal.timeout(3500)
     });
     const getData = await getRes.json().catch(() => ({}));
@@ -880,7 +950,7 @@ app.post('/api/sanaei/inbounds/toggle', async (req, res) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Cookie': `3x-ui=${cookie}`
+        ...getSanaeiHeaders(req.body, cookie)
       },
       body: JSON.stringify(currentObj),
       signal: AbortSignal.timeout(4000)
@@ -922,7 +992,7 @@ app.post('/api/sanaei/inbounds/delete', async (req, res) => {
     const delUrl = `http://${host}:${port}${cleanBasePath}/panel/api/inbounds/del/${inboundId}`;
     const delRes = await fetch(delUrl, {
       method: 'POST',
-      headers: { 'Cookie': `3x-ui=${cookie}` },
+      headers: getSanaeiHeaders(req.body, cookie),
       signal: AbortSignal.timeout(4000)
     });
     const delData = await delRes.json().catch(() => ({}));
@@ -952,7 +1022,7 @@ app.post('/api/sanaei/inbounds/reset-traffic', async (req, res) => {
     const resetUrl = `http://${host}:${port}${cleanBasePath}/panel/api/inbounds/resetAllTraffics`;
     const rRes = await fetch(resetUrl, {
       method: 'POST',
-      headers: { 'Cookie': `3x-ui=${cookie}` },
+      headers: getSanaeiHeaders(req.body, cookie),
       signal: AbortSignal.timeout(4000)
     });
     const rData = await rRes.json().catch(() => ({}));
@@ -982,7 +1052,7 @@ app.post('/api/sanaei/server/status', async (req, res) => {
     const statusUrl = `http://${host}:${port}${cleanBasePath}/server/status`;
     const sRes = await fetch(statusUrl, {
       method: 'POST',
-      headers: { 'Cookie': `3x-ui=${cookie}` },
+      headers: getSanaeiHeaders(req.body, cookie),
       signal: AbortSignal.timeout(4000)
     });
     const sData = await sRes.json().catch(() => ({}));
@@ -1147,34 +1217,14 @@ app.post('/api/sanaei/create-multi-inbounds', async (req, res) => {
   const { host = activeKharejIP, port = 2053, basePath = '', username = 'admin', password = '' } = req.body;
   const cleanBasePath = basePath ? (basePath.startsWith('/') ? basePath : '/' + basePath) : '';
 
-  let activeCookie = '';
-  let apiLoggedIn = false;
+  let activeCookie = await resolveSanaeiCookie(req.body);
+  let apiLoggedIn = !!activeCookie;
   let connectionError = null;
 
-  if (password) {
-    try {
-      const loginUrl = `http://${host}:${port}${cleanBasePath}/login`;
-      const formParams = new URLSearchParams();
-      formParams.append('username', username);
-      formParams.append('password', password);
-      const lRes = await fetch(loginUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: formParams,
-        signal: AbortSignal.timeout(4000)
-      });
-      const lCookies = lRes.headers.get('set-cookie') || '';
-      const m = lCookies.match(/3x-ui=([^;]+)/);
-      if (m) {
-        activeCookie = m[1];
-        apiLoggedIn = true;
-      } else {
-        const lData = await lRes.json().catch(() => ({}));
-        connectionError = lData.msg || 'رمز عبور سنایی نادرست است';
-      }
-    } catch (e) {
-      connectionError = `ارتباط با پورت ${port} سنایی برقرار نشد (${e.message})`;
-    }
+  if (!activeCookie && password) {
+    connectionError = 'اطلاعات ورود به سنایی نادرست است';
+  } else if (!activeCookie && !req.body.apiToken) {
+    connectionError = `ارتباط با پورت ${port} سنایی برقرار نشد`;
   }
 
   const results = [];
@@ -1211,10 +1261,10 @@ app.post('/api/sanaei/create-multi-inbounds', async (req, res) => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Cookie': `3x-ui=${activeCookie}`
+            ...getSanaeiHeaders(req.body, activeCookie)
           },
           body: JSON.stringify(inboundPayload),
-          signal: AbortSignal.timeout(3000)
+          signal: AbortSignal.timeout(3500)
         });
         const addData = await addRes.json().catch(() => ({}));
         if (addData.success) {

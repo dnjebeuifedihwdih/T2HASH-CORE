@@ -38,8 +38,14 @@ export DEBIAN_FRONTEND=noninteractive
 apt-get update -y >/dev/null 2>&1 || true
 apt-get install -y -q curl git tar ufw iptables >/dev/null 2>&1 || true
 
+if ! command -v node >/dev/null 2>&1; then
+  echo -e "      Installing Node.js package..."
+  apt-get update -y >/dev/null 2>&1 || true
+  apt-get install -y -q nodejs npm >/dev/null 2>&1 || true
+fi
+
 if ! command -v node >/dev/null 2>&1 || [ "$(node -v 2>/dev/null | grep -oE 'v[0-9]+' | sed 's/v//' || echo 0)" -lt 18 ]; then
-  echo -e "      Installing Node.js 20 LTS..."
+  echo -e "      Upgrading to Node.js 20 LTS..."
   curl -fsSL https://deb.nodesource.com/setup_20.x | bash - >/dev/null 2>&1 || true
   apt-get install -y -q nodejs >/dev/null 2>&1 || true
 fi
