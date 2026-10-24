@@ -38,7 +38,7 @@ const CONFIG_STORE = {
   frag: 4,
   autoRestart: true,
   bbrEnabled: true,
-  repoUrl: 'https://github.com/T2HASH/T2HASH-CORE.git',
+  repoUrl: 'https://github.com/dnjebeuifedihwdih/T2HASH-CORE.git',
   xrayInstalled: true,
   serviceState: 'active',
   serviceActive: true,
@@ -46,15 +46,15 @@ const CONFIG_STORE = {
   adminPassHash: crypto.createHash('sha256').update('admin:admin123').digest('hex')
 };
 
-// Official Raw GitHub Repository URLs for T2HASH-CORE
-const GITHUB_RAW_BASE = 'https://raw.githubusercontent.com/T2HASH/T2HASH-CORE/main';
+// Official Raw GitHub Repository URLs for T2HASH-CORE (dnjebeuifedihwdih/T2HASH-CORE)
+const GITHUB_RAW_BASE = 'https://raw.githubusercontent.com/dnjebeuifedihwdih/T2HASH-CORE/main';
 const GITHUB_SCRIPTS = {
   kharej: `${GITHUB_RAW_BASE}/install-kharej.sh`,
   iran: `${GITHUB_RAW_BASE}/install-iran.sh`,
   dual: `${GITHUB_RAW_BASE}/install-dual.sh`,
   sanaei: `${GITHUB_RAW_BASE}/install-sanaei.sh`,
   t2tunnelOfficial: `${GITHUB_RAW_BASE}/t2tunnel/install.sh`,
-  officialRepo: 'https://github.com/T2HASH/T2HASH-CORE.git'
+  officialRepo: 'https://github.com/dnjebeuifedihwdih/T2HASH-CORE.git'
 };
 
 // In-memory active sessions
@@ -456,16 +456,16 @@ app.get('/api/scripts/all', (req, res) => {
   // 1-Click command for Windows users (CMD / PowerShell) to connect to VPS and install automatically
   const windowsKharejOneClick = `ssh -t root@${kharejIP} "curl -fsSL ${kharejHostedUrl} | bash"`;
   const windowsIranOneClick = `ssh -t root@${iranIP} "curl -fsSL ${iranHostedUrl} | bash"`;
-  const windowsKharejGitDirect = `ssh -t root@${kharejIP} "git clone https://github.com/T2HASH/T2HASH-CORE.git && cd T2HASH-CORE/t2tunnel && bash install.sh"`;
+  const windowsKharejGitDirect = `ssh -t root@${kharejIP} "curl -fsSL https://raw.githubusercontent.com/dnjebeuifedihwdih/T2HASH-CORE/main/install-kharej.sh | sudo bash || (git clone https://github.com/dnjebeuifedihwdih/T2HASH-CORE.git && cd T2HASH-CORE && sudo bash install-kharej.sh)"`;
 
-  // Standard official T2HASH GitHub direct commands
-  const officialGithubClone = 'git clone https://github.com/T2HASH/T2HASH-CORE.git && cd T2HASH-CORE/t2tunnel && sudo bash install.sh';
-  const officialGithubCurl = 'curl -fsSL https://raw.githubusercontent.com/T2HASH/T2HASH-CORE/main/t2tunnel/install.sh | sudo bash';
+  // Standard GitHub direct commands for dnjebeuifedihwdih/T2HASH-CORE
+  const officialGithubClone = 'git clone https://github.com/dnjebeuifedihwdih/T2HASH-CORE.git && cd T2HASH-CORE && sudo bash install-kharej.sh';
+  const officialGithubCurl = 'curl -fsSL https://raw.githubusercontent.com/dnjebeuifedihwdih/T2HASH-CORE/main/install-kharej.sh | sudo bash';
 
   res.json({
     ok: true,
     baseUrl,
-    githubRepo: 'https://github.com/T2HASH/T2HASH-CORE',
+    githubRepo: 'https://github.com/dnjebeuifedihwdih/T2HASH-CORE',
     officialCommand: officialGithubClone,
     officialCurl: officialGithubCurl,
     windowsKharejGitDirect,
@@ -476,7 +476,7 @@ app.get('/api/scripts/all', (req, res) => {
       hostedUrl: kharejHostedUrl,
       rawUrl: GITHUB_SCRIPTS.kharej,
       curlCommand: kharejCurl,
-      githubCurl: 'curl -fsSL https://raw.githubusercontent.com/T2HASH/T2HASH-CORE/main/install-kharej.sh | sudo bash',
+      githubCurl: 'curl -fsSL https://raw.githubusercontent.com/dnjebeuifedihwdih/T2HASH-CORE/main/install-kharej.sh | sudo bash',
       githubClone: officialGithubClone,
       windowsCommand: windowsKharejOneClick,
       code: generateKharejScript(opts)
@@ -488,7 +488,7 @@ app.get('/api/scripts/all', (req, res) => {
       hostedUrl: iranHostedUrl,
       rawUrl: GITHUB_SCRIPTS.iran,
       curlCommand: iranCurl,
-      githubCurl: 'curl -fsSL https://raw.githubusercontent.com/T2HASH/T2HASH-CORE/main/install-iran.sh | sudo bash',
+      githubCurl: 'curl -fsSL https://raw.githubusercontent.com/dnjebeuifedihwdih/T2HASH-CORE/main/install-iran.sh | sudo bash',
       windowsCommand: windowsIranOneClick,
       code: generateIranScript(opts)
     },
@@ -499,7 +499,7 @@ app.get('/api/scripts/all', (req, res) => {
       hostedUrl: dualHostedUrl,
       rawUrl: GITHUB_SCRIPTS.dual,
       curlCommand: dualCurl,
-      githubCurl: 'curl -fsSL https://raw.githubusercontent.com/T2HASH/T2HASH-CORE/main/install-dual.sh | sudo bash',
+      githubCurl: 'curl -fsSL https://raw.githubusercontent.com/dnjebeuifedihwdih/T2HASH-CORE/main/install-dual.sh | sudo bash',
       code: generateDualScript(opts)
     },
     sanaei: {

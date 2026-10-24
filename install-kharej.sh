@@ -13,8 +13,8 @@ set -euo pipefail
 
 KHAREJ_IP="${KHAREJ_IP:-13.140.81.175}"
 PSK_KEY="${PSK_KEY:-t2hash_9f482a17cb03da5e718b45620f3e8291}"
-REPO_URL="https://github.com/T2HASH/T2HASH-CORE.git"
-REPO_FALLBACK="https://ghproxy.net/https://github.com/T2HASH/T2HASH-CORE.git"
+REPO_URL="https://github.com/dnjebeuifedihwdih/T2HASH-CORE.git"
+REPO_FALLBACK="https://ghproxy.net/https://github.com/dnjebeuifedihwdih/T2HASH-CORE.git"
 
 # Terminal Colors
 GREEN='\033[0;32m'
@@ -96,7 +96,11 @@ if ! git clone "$REPO_URL" "$WORK_DIR" 2>/dev/null; then
   git clone "$REPO_FALLBACK" "$WORK_DIR" || git clone "https://ghproxy.net/$REPO_URL" "$WORK_DIR"
 fi
 
-cd "$WORK_DIR/t2tunnel"
+if [ -d "$WORK_DIR/t2tunnel" ]; then
+  cd "$WORK_DIR/t2tunnel"
+else
+  cd "$WORK_DIR"
+fi
 go mod tidy || true
 go build -trimpath -ldflags '-s -w' -o /usr/local/bin/t2tunnel .
 chmod +x /usr/local/bin/t2tunnel

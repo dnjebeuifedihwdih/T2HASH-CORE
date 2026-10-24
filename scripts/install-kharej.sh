@@ -14,7 +14,7 @@ set -euo pipefail
 KHAREJ_IP="${KHAREJ_IP:-13.140.81.175}"
 PSK_KEY="${PSK_KEY:-t2hash_9f482a17cb03da5e718b45620f3e8291}"
 REPO_URL="https://github.com/dnjebeuifedihwdih/T2HASH-CORE.git"
-REPO_FALLBACK="https://github.com/T2HASH/T2HASH-CORE.git"
+REPO_FALLBACK="https://ghproxy.net/https://github.com/dnjebeuifedihwdih/T2HASH-CORE.git"
 
 # Terminal Colors
 GREEN='\033[0;32m'

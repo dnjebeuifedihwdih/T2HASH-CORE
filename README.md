@@ -96,7 +96,7 @@ t2tunnel ترافیک را در چند لایه می‌پیچد و آن را ش�
 
 ```bash
 # ۱. پروژه را بگیر
-git clone https://github.com/T2HASH/T2HASH-CORE.git && cd T2HASH-CORE/t2tunnel && sudo bash install.sh
+git clone https://github.com/dnjebeuifedihwdih/T2HASH-CORE.git && cd T2HASH-CORE/t2tunnel && sudo bash install.sh
 cd t2tunnel
 
 # ۲. اسکریپتِ نصب را اجرا کن

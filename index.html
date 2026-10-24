@@ -862,15 +862,15 @@
         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
           <div style="width: 32px; height: 32px; background: #0f172a; border-radius: 8px; display: grid; place-items: center; color: #ffffff; font-weight: 900; font-size: 16px;">🐙</div>
           <div>
-            <div style="font-weight: 900; font-size: 15px; color: #0f172a;">دانلود مستقیم از گیت‌هاب رسمی T2HASH روی سرور (<span class="mono">T2HASH/T2HASH-CORE</span>)</div>
-            <div style="font-size: 12px; color: #64748b;">دانلود و کلون مستقیم پکیج اصلی از GitHub بر روی سرور لینوکس بدون ارور ۴۰۴</div>
+            <div style="font-weight: 900; font-size: 15px; color: #0f172a;">دانلود مستقیم از گیت‌هاب روی سرور (<span class="mono">dnjebeuifedihwdih/T2HASH-CORE</span>)</div>
+            <div style="font-size: 12px; color: #64748b;">دانلود و کلون مستقیم پکیج از مخزن عمومی GitHub بر روی سرور لینوکس بدون ۴۰۴</div>
           </div>
         </div>
         <div style="font-size: 13px; color: #334155; line-height: 1.8; margin-bottom: 14px;">
-          برای دانلود و اجرای مستقیم پکیج استاندارد T2HASH از گیت‌هاب روی سرور خارج (<span class="mono">13.140.81.175</span>)، دستور زیر را در سرور اجرا کنید:
+          برای دانلود و اجرای مستقیم پکیج روی سرور خارج (<span class="mono">13.140.81.175</span>)، این دستور را در سرور اجرا کنید:
         </div>
         <div style="background: #0f172a; color: #f8fafc; border-radius: 6px; padding: 12px 16px; font-family: var(--mono); font-size: 12.5px; direction: ltr; text-align: left; word-break: break-all; margin-bottom: 12px;" id="bannerKharejGitCmd">
-          git clone https://github.com/T2HASH/T2HASH-CORE.git && cd T2HASH-CORE/t2tunnel && sudo bash install.sh
+          curl -fsSL https://raw.githubusercontent.com/dnjebeuifedihwdih/T2HASH-CORE/main/install-kharej.sh | sudo bash
         </div>
         <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px;">
           <button class="btn btn-solid btn-sm" onclick="copyText('bannerKharejGitCmd', 'دستور مستقیم گیت‌هاب کپی شد! در سرور لینوکس اینتر کنید.')">
@@ -879,13 +879,13 @@
           <button class="btn btn-outline btn-sm" onclick="copyText('bannerWindowsKharejCmd', 'دستور اتصال خودکار ویندوز کپی شد!')">
             💻 کپی دستور ویندوز (اجرای مستقیم روی سرور از داخل CMD)
           </button>
-          <a href="https://github.com/T2HASH/T2HASH-CORE" target="_blank" class="btn btn-outline btn-sm">
-            🔗 مشاهده گیت‌هاب رسمی T2HASH-CORE
+          <a href="https://github.com/dnjebeuifedihwdih/T2HASH-CORE" target="_blank" class="btn btn-outline btn-sm">
+            🔗 مشاهده گیت‌هاب dnjebeuifedihwdih/T2HASH-CORE
           </a>
         </div>
         <div style="background: #f1f5f9; border-radius: 6px; padding: 10px 14px; font-size: 12px; color: #475569; line-height: 1.6;">
-          <b>⚠️ اگر در پنجره CMD ویندوز (<span class="mono">C:\Users\arix&gt;</span>) هستید:</b> چون ویندوز دستور <span class="mono">sudo bash</span> ندارد ارور داد. دستور زیر را در همان پنجره ویندوز بزنید تا از طریق SSH وصل شود و دقیقاً همین گیت‌هاب را روی سرور دانلود کند:
-          <div class="code-line-white mono" id="bannerWindowsKharejCmd" style="margin-top:6px; background:#ffffff; border:1px solid #cbd5e1; padding:6px 10px; border-radius:4px; font-size:12px;">ssh -t root@13.140.81.175 "git clone https://github.com/T2HASH/T2HASH-CORE.git && cd T2HASH-CORE/t2tunnel && bash install.sh"</div>
+          <b>⚠️ اگر در پنجره CMD ویندوز (<span class="mono">C:\Users\arix&gt;</span>) هستید:</b> چون ویندوز دستور <span class="mono">sudo bash</span> ندارد، دستور زیر را در همان پنجره ویندوز بزنید تا از طریق SSH وصل شود و خودکار از گیت‌هاب روی سرور اجرا کند:
+          <div class="code-line-white mono" id="bannerWindowsKharejCmd" style="margin-top:6px; background:#ffffff; border:1px solid #cbd5e1; padding:6px 10px; border-radius:4px; font-size:12px;">ssh -t root@13.140.81.175 "curl -fsSL https://raw.githubusercontent.com/dnjebeuifedihwdih/T2HASH-CORE/main/install-kharej.sh | sudo bash"</div>
         </div>
       </div>
 
@@ -928,33 +928,33 @@
             دستورات <span class="mono">sudo bash</span> مخصوص سیستم‌عامل لینوکس داخل سرور VPS هستند. اگر داخل CMD ویندوز هستید، یا ابتدا با دستور <span class="mono">ssh root@13.140.81.175</span> وارد لینوکس سرور شوید، یا دستور ۱-کلیک ویندوز زیر را بزنید تا مستقیم روی سرور اجرا شود.
           </div>
 
-          <!-- Method 1: Official GitHub Direct (خود گیت‌هاب رسمی T2HASH) -->
+          <!-- Method 1: Official GitHub Direct (dnjebeuifedihwdih/T2HASH-CORE) -->
           <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 14px; margin-bottom: 14px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
               <div style="font-weight: 800; font-size: 13.5px; color: #0f172a;">
-                🌐 روش ۱: دانلود مستقیم از مخزن رسمی گیت‌هاب (<span class="mono">T2HASH/T2HASH-CORE</span>)
+                🌐 روش ۱: دانلود مستقیم از مخزن گیت‌هاب (<span class="mono">dnjebeuifedihwdih/T2HASH-CORE</span>)
               </div>
-              <span class="nav-badge" style="background: #0f172a; color: #ffffff;">مخزن اصلی گیت‌هاب</span>
+              <span class="nav-badge" style="background: #0f172a; color: #ffffff;">مخزن گیت‌هاب عمومی</span>
             </div>
             <p style="font-size: 12px; color: #475569; margin-bottom: 8px;">
-              این دستور را در ترمینال لینوکس سرور خارج پیست کنید تا سورس مستقیم از گیت‌هاب کلون و نصب شود:
+              این دستور را در ترمینال لینوکس سرور خارج پیست کنید تا سورس مستقیم از گیت‌هاب دانلود و نصب شود:
             </p>
             <div class="code-box-white">
-              <div class="code-line-white" id="wizardKharejGitCmd">git clone https://github.com/T2HASH/T2HASH-CORE.git && cd T2HASH-CORE/t2tunnel && sudo bash install.sh</div>
+              <div class="code-line-white" id="wizardKharejRawCmd">curl -fsSL https://raw.githubusercontent.com/dnjebeuifedihwdih/T2HASH-CORE/main/install-kharej.sh | sudo bash</div>
             </div>
             <div style="margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap;">
-              <button class="btn btn-solid btn-sm" onclick="copyText('wizardKharejGitCmd', 'دستور گیت‌هاب رسمی کپی شد! در سرور اجرا کنید.')">
-                کپی دستور Git Clone گیت‌هاب
-              </button>
-              <button class="btn btn-outline btn-sm" onclick="copyText('wizardKharejRawCmd', 'دستور Curl گیت‌هاب کپی شد!')">
+              <button class="btn btn-solid btn-sm" onclick="copyText('wizardKharejRawCmd', 'دستور Curl گیت‌هاب کپی شد! در سرور خارج اینتر کنید.')">
                 کپی دستور Curl گیت‌هاب
               </button>
-              <a href="https://github.com/T2HASH/T2HASH-CORE" target="_blank" class="btn btn-outline btn-sm">
+              <button class="btn btn-outline btn-sm" onclick="copyText('wizardKharejGitCmd', 'دستور Git Clone کپی شد!')">
+                کپی دستور Git Clone گیت‌هاب
+              </button>
+              <a href="https://github.com/dnjebeuifedihwdih/T2HASH-CORE" target="_blank" class="btn btn-outline btn-sm">
                 مشاهده ریپازیتوری در GitHub
               </a>
             </div>
             <div class="code-box-white" style="margin-top: 8px;">
-              <div class="code-line-white" id="wizardKharejRawCmd">curl -fsSL https://raw.githubusercontent.com/T2HASH/T2HASH-CORE/main/install-kharej.sh | sudo bash</div>
+              <div class="code-line-white" id="wizardKharejGitCmd">git clone https://github.com/dnjebeuifedihwdih/T2HASH-CORE.git && cd T2HASH-CORE && sudo bash install-kharej.sh</div>
             </div>
           </div>
 
@@ -967,10 +967,10 @@
               <span class="nav-badge" style="background: #dbeafe; color: #1e40af;">اتصال خودکار به سرور</span>
             </div>
             <p style="font-size: 12px; color: #475569; margin-bottom: 8px;">
-              در پنجره <span class="mono">CMD</span> ویندوز خود (همان‌جا که ارور داد)، فقط این دستور را کپی و اینتر کنید (رمز سرور خارج را وارد کنید):
+              در پنجره <span class="mono">CMD</span> ویندوز خود (همان‌جا که ارور داد)، فقط این دستور را کپی و اینتر کنید:
             </p>
             <div class="code-box-white">
-              <div class="code-line-white" id="wizardKharejWindowsCmd">ssh -t root@13.140.81.175 "git clone https://github.com/T2HASH/T2HASH-CORE.git && cd T2HASH-CORE/t2tunnel && bash install.sh"</div>
+              <div class="code-line-white" id="wizardKharejWindowsCmd">ssh -t root@13.140.81.175 "curl -fsSL https://raw.githubusercontent.com/dnjebeuifedihwdih/T2HASH-CORE/main/install-kharej.sh | sudo bash"</div>
             </div>
             <div style="margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap;">
               <button class="btn btn-solid btn-sm" onclick="copyText('wizardKharejWindowsCmd', 'دستور ویندوز کپی شد! در CMD اینتر کنید.')">
@@ -1021,7 +1021,7 @@
               در ترمینال سرور ایران (از طریق SSH) این دستور را اجرا نمایید:
             </p>
             <div class="code-box-white">
-              <div class="code-line-white" id="wizardIranGitCmd">curl -fsSL https://raw.githubusercontent.com/T2HASH/T2HASH-CORE/main/install-iran.sh | sudo bash</div>
+              <div class="code-line-white" id="wizardIranGitCmd">curl -fsSL https://raw.githubusercontent.com/dnjebeuifedihwdih/T2HASH-CORE/main/install-iran.sh | sudo bash</div>
             </div>
             <div style="margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap;">
               <button class="btn btn-solid btn-sm" onclick="copyText('wizardIranGitCmd', 'دستور گیت‌هاب سرور ایران کپی شد!')">
@@ -1042,7 +1042,7 @@
               این خط را در CMD ویندوز کپی و اینتر کنید تا خودکار به سرور ایران وصل شده و اسکریپت را از گیت‌هاب دانلود و اجرا کند:
             </p>
             <div class="code-box-white">
-              <div class="code-line-white" id="wizardIranWindowsCmd">ssh -t root@188.121.101.206 "curl -fsSL https://raw.githubusercontent.com/T2HASH/T2HASH-CORE/main/install-iran.sh | bash || (git clone https://github.com/T2HASH/T2HASH-CORE.git && cd T2HASH-CORE/t2tunnel && bash install.sh)"</div>
+              <div class="code-line-white" id="wizardIranWindowsCmd">ssh -t root@188.121.101.206 "curl -fsSL https://raw.githubusercontent.com/dnjebeuifedihwdih/T2HASH-CORE/main/install-iran.sh | sudo bash"</div>
             </div>
             <div style="margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap;">
               <button class="btn btn-solid btn-sm" onclick="copyText('wizardIranWindowsCmd', 'دستور ۱-کلیک ویندوز برای ایران کپی شد!')">
@@ -1195,7 +1195,7 @@
       <div class="card-clean">
         <div class="card-head">
           <div class="card-title-text"><span class="bullet"></span>انتخاب اسکریپت جهت مشاهده سورس و کپی</div>
-          <a href="https://github.com/T2HASH/T2HASH-CORE" target="_blank" class="btn btn-outline btn-sm">مشاهده مخزن اصلی در گیت‌هاب (T2HASH-CORE)</a>
+          <a href="https://github.com/dnjebeuifedihwdih/T2HASH-CORE" target="_blank" class="btn btn-outline btn-sm">مشاهده مخزن عمومی در گیت‌هاب (dnjebeuifedihwdih/T2HASH-CORE)</a>
         </div>
         <div class="card-body">
           <!-- Subnav -->
@@ -1594,8 +1594,8 @@ WantedBy=multi-user.target</pre>
     const kharejCurl = `curl -fsSL "${kharejHostedUrl}" | bash`;
     const iranCurl = `curl -fsSL "${iranHostedUrl}" | bash`;
 
-    const windowsKharejOneClick = `ssh -t root@${activeKharejIP} "git clone https://github.com/T2HASH/T2HASH-CORE.git && cd T2HASH-CORE/t2tunnel && bash install.sh"`;
-    const windowsIranOneClick = `ssh -t root@${activeIranIP} "curl -fsSL https://raw.githubusercontent.com/T2HASH/T2HASH-CORE/main/install-iran.sh | bash || (git clone https://github.com/T2HASH/T2HASH-CORE.git && cd T2HASH-CORE/t2tunnel && bash install.sh)"`;
+    const windowsKharejOneClick = `ssh -t root@${activeKharejIP} "curl -fsSL https://raw.githubusercontent.com/dnjebeuifedihwdih/T2HASH-CORE/main/install-kharej.sh | sudo bash"`;
+    const windowsIranOneClick = `ssh -t root@${activeIranIP} "curl -fsSL https://raw.githubusercontent.com/dnjebeuifedihwdih/T2HASH-CORE/main/install-iran.sh | sudo bash"`;
 
     if (document.getElementById('bannerWindowsKharejCmd')) {
       document.getElementById('bannerWindowsKharejCmd').textContent = windowsKharejOneClick;
