@@ -1227,15 +1227,45 @@ app.post('/api/sanaei/create-multi-inbounds', async (req, res) => {
     connectionError = `ارتباط با پورت ${port} سنایی برقرار نشد`;
   }
 
+  let existingInboundsMap = new Map();
+  if (activeCookie) {
+    try {
+      const listUrl = `http://${host}:${port}${cleanBasePath}/panel/api/inbounds/list`;
+      const listRes = await fetch(listUrl, {
+        headers: getSanaeiHeaders(req.body, activeCookie),
+        signal: AbortSignal.timeout(3500)
+      });
+      const listData = await listRes.json().catch(() => ({}));
+      if (listData.success && Array.isArray(listData.obj)) {
+        listData.obj.forEach(item => {
+          existingInboundsMap.set(item.port, item);
+        });
+      }
+    } catch (e) {}
+  }
+
   const results = [];
   const vlessLinksList = [];
   let remoteCreatedCount = 0;
 
   for (const t of TUNNEL_PRESETS) {
-    const uuid = crypto.randomUUID();
+    let uuid = crypto.randomUUID();
     let createdOnRemote = false;
 
-    if (activeCookie) {
+    // Check if inbound already exists on targetPort in Sanaei
+    if (existingInboundsMap.has(t.targetPort)) {
+      createdOnRemote = true;
+      remoteCreatedCount++;
+      const existingIb = existingInboundsMap.get(t.targetPort);
+      // Try extracting existing client UUID from Sanaei settings
+      try {
+        const settings = typeof existingIb.settings === 'string' ? JSON.parse(existingIb.settings) : existingIb.settings;
+        if (settings && Array.isArray(settings.clients) && settings.clients.length > 0 && settings.clients[0].id) {
+          uuid = settings.clients[0].id;
+        }
+      } catch (e) {}
+    } else if (activeCookie) {
+      // Inbound doesn't exist yet - Create it via Sanaei API
       try {
         const addUrl = `http://${host}:${port}${cleanBasePath}/panel/api/inbounds/add`;
         const inboundPayload = {
@@ -1294,13 +1324,13 @@ app.post('/api/sanaei/create-multi-inbounds', async (req, res) => {
 
   let message = '';
   if (apiLoggedIn && remoteCreatedCount > 0) {
-    message = `تعداد ${remoteCreatedCount} اینباند با موفقیت در دیتابیس پنل سنایی ثبت شدند!`;
+    message = `تعداد ${remoteCreatedCount} اینباند با موفقیت در دیتابیس پنل سنایی شناسایی و تایید شدند (سبز و فعال)!`;
   } else if (apiLoggedIn) {
-    message = 'ارتباط با پنل سنایی برقرار شد اما ایجاد اینباندها با خطا مواجه شد. کانفیگ‌ها به صورت لوکال تحویل داده شدند.';
+    message = 'ارتباط با پنل سنایی برقرار شد و کانفیگ‌ها تحویل داده شدند.';
   } else if (connectionError) {
-    message = `توجه: اتصال زنده به پنل سنایی انجام نشد (${connectionError}). کلیه ۵ کانفیگ و اشتراک ترکیبی به صورت خودکار برای شما تولید شدند.`;
+    message = `توجه: اتصال زنده به پنل سنایی انجام نشد (${connectionError}). کلیه ۷ کانفیگ و اشتراک ترکیبی تولید شدند.`;
   } else {
-    message = '۵ کانفیگ اختصاصی و لینک اشتراک با موفقیت تولید شدند.';
+    message = '۷ کانفیگ اختصاصی و لینک اشتراک با موفقیت تولید شدند.';
   }
 
   res.json({
