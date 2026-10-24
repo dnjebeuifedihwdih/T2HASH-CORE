@@ -223,6 +223,14 @@ function generateSanaeiScript() {
   }
 }
 
+function generatePanelScript() {
+  try {
+    return fs.readFileSync(path.join(__dirname, 'install-panel.sh'), 'utf-8');
+  } catch (e) {
+    return '#!/usr/bin/env bash\necho "Script loading failed"';
+  }
+}
+
 // ---------------------------------------------------------
 // Direct Script Download Routes (Curlable by remote servers & browsers)
 // ---------------------------------------------------------
@@ -246,6 +254,10 @@ app.get(['/scripts/dual.sh', '/scripts/install-dual.sh', '/install-dual.sh'], (r
 
 app.get(['/scripts/sanaei.sh', '/scripts/install-sanaei.sh', '/install-sanaei.sh'], (req, res) => {
   sendScript(res, generateSanaeiScript());
+});
+
+app.get(['/scripts/panel.sh', '/scripts/install-panel.sh', '/install-panel.sh'], (req, res) => {
+  sendScript(res, generatePanelScript());
 });
 
 app.get(['/scripts/kharej.bat', '/install-kharej.bat'], (req, res) => {
@@ -1423,6 +1435,32 @@ app.post('/api/test-peer', async (req, res) => {
     message: probe.message,
     timestamp: new Date().toISOString()
   });
+});
+
+app.post('/api/panel/host-action', async (req, res) => {
+  const { action, role = 'kharej' } = req.body;
+  addLog(`[PANEL HOST ACTION] Request to execute action: ${action} (${role})`);
+
+  let cmd = '';
+  if (action === 'install_tunnels') {
+    const scriptFile = role === 'iran' ? 'install-iran.sh' : 'install-kharej.sh';
+    cmd = `sudo bash ${path.join(__dirname, scriptFile)}`;
+  } else if (action === 'restart_panel') {
+    cmd = 'sudo systemctl restart mhtunnel-panel.service';
+  } else if (action === 'status_panel') {
+    cmd = 'systemctl status mhtunnel-panel.service --no-pager';
+  } else if (action === 'system_info') {
+    cmd = 'uname -a && uptime && free -h && df -h /';
+  } else {
+    return res.status(400).json({ ok: false, error: 'دستور نامعتبر است' });
+  }
+
+  try {
+    const { stdout, stderr } = await execPromise(cmd, { timeout: 60000 });
+    return res.json({ ok: true, action, output: stdout || stderr || 'دستور با موفقیت در سرور اجرا شد.' });
+  } catch (err) {
+    return res.json({ ok: false, action, output: err.stdout || err.stderr || err.message });
+  }
 });
 
 app.post('/api/action', (req, res) => {

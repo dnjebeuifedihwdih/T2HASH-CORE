@@ -862,6 +862,12 @@
         <span class="nav-badge" style="background:#fee2e2; color:#b91c1c;">API کامل</span>
       </button>
 
+      <button class="nav-btn" data-tab="panel-install">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        نصب این پنل روی سرور
+        <span class="nav-badge" style="background:#16a34a; color:#fff;">مستقل (شبیه سنایی)</span>
+      </button>
+
       <button class="nav-btn" data-tab="arvan-guide">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
         راهنمای آروان کلاد و سنایی
@@ -1389,24 +1395,30 @@
         <div class="card-body">
           <div class="grid-2">
             <div class="field-wrap">
-              <label class="field-lbl">آدرس IP یا دامنه پنل سنایی</label>
-              <input class="inp-clean" id="snHost" value="13.140.81.175">
+              <label class="field-lbl">آدرس IP سرور خارج</label>
+              <input class="inp-clean" id="snHost" value="13.140.87.14">
             </div>
             <div class="field-wrap">
-              <label class="field-lbl">پورت پنل سنایی</label>
-              <input class="inp-clean" id="snPort" value="2053">
+              <label class="field-lbl">پورت پنل سنایی (Port)</label>
+              <input class="inp-clean" id="snPort" value="53008">
             </div>
           </div>
 
           <div class="grid-2">
             <div class="field-wrap">
               <label class="field-lbl">نام کاربری سنایی (Username)</label>
-              <input class="inp-clean" id="snUser" value="admin">
+              <input class="inp-clean" id="snUser" value="aeHacrxuu1">
             </div>
             <div class="field-wrap">
               <label class="field-lbl">رمز عبور سنایی (Password)</label>
-              <input class="inp-clean" id="snPass" type="password" placeholder="رمز عبور پنل سنایی شما">
+              <input class="inp-clean" id="snPass" type="password" value="dm0vvyKm7M">
             </div>
+          </div>
+
+          <div class="field-wrap" style="margin-bottom: 12px;">
+            <label class="field-lbl">مسیر پایه وب‌پنل (WebBasePath / Secret URL)</label>
+            <input class="inp-clean" id="snBasePath" value="WTy9cJKmxOphyIW78A" placeholder="مثلاً: WTy9cJKmxOphyIW78A">
+            <div class="field-hint">مسیر مخفی آدرس URL پنل سنایی شما جهت جلوگیری از اسکن فایروال</div>
           </div>
 
           <div style="display:flex; gap:10px; margin-top:8px; flex-wrap:wrap;">
@@ -1500,6 +1512,101 @@
               </p>
             </div>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         VIEW: STANDALONE PANEL INSTALLER (استقرار پنل مستقل روی سرور)
+         ==================================================================== -->
+    <section class="view-pane" id="pane-panel-install">
+      <div class="page-title-box">
+        <div class="page-kicker">STANDALONE SERVER PANEL DEPLOYMENT / 3X-UI & SANAEI STYLE</div>
+        <h1 class="page-heading">استقرار و نصب مستقیم این پنل وب روی سرور شما</h1>
+        <p class="page-lead">شما می‌توانید همین پنل کامل مدیریت تانل‌ها را مستقیماً روی سرور لینوکس (ایران یا خارج) نصب کنید تا به عنوان سرویس دائمی (systemd) روی پورت ۳۰۰۰ اجرا شود.</p>
+      </div>
+
+      <div class="wizard-step-card">
+        <div class="wizard-step-header">
+          <div class="wizard-step-number">⚡</div>
+          <div>
+            <div class="wizard-step-title">دستور نصب ۱-کلیک پنل مدیریت روی سرور لینوکس (اوبونتو / دبیان)</div>
+            <div class="wizard-step-subtitle">نصب خودکار Node.js 20 LTS، ایجاد دمون سرویس mhtunnel-panel و باز کردن پورت ۳۰۰۰ در فایروال</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <p style="font-size:13px; color:var(--ink-dim); margin-bottom:10px;">
+            کافی است به ترمینال سرور خود متصل شده و این دستور ۱-خطی را پیست و اینتر کنید:
+          </p>
+          <div class="code-box-white" style="margin-bottom:12px;">
+            <div class="code-line-white" id="panelInstallOneLiner">curl -fsSL https://raw.githubusercontent.com/dnjebeuifedihwdih/T2HASH-CORE/main/install-panel.sh | sudo bash</div>
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn btn-solid btn-sm" onclick="copyText('panelInstallOneLiner', 'دستور نصب ۱-کلیک پنل کپی شد!')">
+              کپی دستور نصب پنل روی سرور
+            </button>
+            <a href="/scripts/panel.sh" id="linkDownloadPanelSh" download="install-panel.sh" class="btn btn-outline btn-sm">
+              دانلود اسکریپت install-panel.sh
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:18px;">
+        <div class="card-clean">
+          <div class="card-head">
+            <div class="card-title-text"><span class="bullet"></span>قابلیت‌های پنل مستقر شده روی سرور</div>
+          </div>
+          <div class="card-body" style="font-size:12.5px; color:var(--ink-dim); line-height:1.9;">
+            • <b>اجرای همیشگی در پس‌زمینه:</b> در قالب سرویس <span class="mono">mhtunnel-panel.service</span> با قابلیت استارت خودکار هنگام بوت سیستم.<br>
+            • <b>دسترسی مستقیم مرورگر:</b> ورود به پنل از طریق آدرس <span class="mono">http://YOUR_SERVER_IP:3000</span>.<br>
+            • <b>اجرای مستقیم تانل‌ها:</b> امکان نصب و راه‌اندازی ۷ تانل محلی روی همین سرور بدون نیاز به SSH جداگانه.<br>
+            • <b>اتصال به سنایی (3x-ui):</b> مدیریت کامل اینباندهای سنایی از داخل همین پنل.
+          </div>
+        </div>
+
+        <div class="card-clean">
+          <div class="card-head">
+            <div class="card-title-text"><span class="bullet"></span>دستورات کنترلی سرویس پنل در ترمینال لینوکس</div>
+          </div>
+          <div class="card-body">
+            <div class="code-box-white" style="font-size:12px; line-height:1.8;">
+              # بررسی وضعیت پنل:<br>
+              <span style="color:#38bdf8;">systemctl status mhtunnel-panel</span><br><br>
+              # ریستارت سرویس پنل:<br>
+              <span style="color:#38bdf8;">systemctl restart mhtunnel-panel</span><br><br>
+              # مشاهده لاگ‌های زنده:<br>
+              <span style="color:#38bdf8;">journalctl -u mhtunnel-panel -f</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Local Host Actions -->
+      <div class="card-clean">
+        <div class="card-head">
+          <div class="card-title-text"><span class="bullet"></span>مدیریت مستقیم سرور از داخل همین پنل (Local Host Control)</div>
+          <span class="status-pill status-pill-active">Host Mode Ready</span>
+        </div>
+        <div class="card-body">
+          <p style="font-size:12.5px; color:var(--ink-dim); margin-bottom:12px;">
+            اگر این پنل روی سرور شما نصب و در حال اجرا است، می‌توانید دستورات زیر را مستقیم روی همین سرور اجرا کنید:
+          </p>
+          <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px;">
+            <button class="btn btn-accent btn-sm" onclick="runHostAction('install_tunnels', 'kharej')">
+              🚀 نصب اتوماتیک ۷ تانل روی همین سرور (سرور خارج)
+            </button>
+            <button class="btn btn-solid btn-sm" onclick="runHostAction('install_tunnels', 'iran')">
+              🔄 نصب اتوماتیک ۷ تانل روی همین سرور (سرور ایران)
+            </button>
+            <button class="btn btn-outline btn-sm" onclick="runHostAction('system_info')">
+              💻 استعلام سیستم، رم و CPU سرور
+            </button>
+            <button class="btn btn-outline btn-sm" onclick="runHostAction('status_panel')">
+              ⚙️ بررسی وضعیت دمون mhtunnel-panel
+            </button>
+          </div>
+          <pre class="code-scroll-white" id="hostActionOutput" style="min-height:100px;">نتیجه اجرای دستور محلی در اینجا نمایش داده می‌شود...</pre>
         </div>
       </div>
     </section>
@@ -2419,7 +2526,7 @@ WantedBy=multi-user.target</pre>
   }
 
   // Live Sanaei Connection Test Helper
-  async function testSanaeiLive(host, port, username, password, statusBoxEl) {
+  async function testSanaeiLive(host, port, basePath, username, password, statusBoxEl) {
     statusBoxEl.classList.remove('hide');
     statusBoxEl.innerHTML = '⏳ در حال تست سوکت و ارسال درخواست احراز هویت به پنل سنایی...';
 
@@ -2432,7 +2539,7 @@ WantedBy=multi-user.target</pre>
       const res = await fetch('/api/sanaei/test-connection', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ host, port, username, password })
+        body: JSON.stringify({ host, port, basePath, username, password })
       });
       const data = await res.json();
       if (data.ok && data.authenticated) {
@@ -2452,7 +2559,7 @@ WantedBy=multi-user.target</pre>
         statusBoxEl.innerHTML = `
           <div style="color:var(--danger); font-weight:800; font-size:13.5px; margin-bottom:4px;">🔴 عدم برقراری ارتباط با پورت سنایی</div>
           <div>${data.error}</div>
-          <div style="margin-top:6px; font-size:11.5px; color:var(--ink-muted);">راهنما: اطمینان حاصل کنید اسکریپت install-sanaei.sh روی سرور اجرا شده و پورت ${port} در فایروال سرور (ufw allow ${port}) باز است.</div>
+          <div style="margin-top:6px; font-size:11.5px; color:var(--ink-muted);">راهنما: اطمینان حاصل کنید پورت ${port} در فایروال سرور (ufw allow ${port}/tcp) باز است.</div>
         `;
         toast('عدم اتصال به پنل سنایی');
       }
@@ -2466,17 +2573,18 @@ WantedBy=multi-user.target</pre>
     const username = document.getElementById('wizSnUser').value.trim();
     const password = document.getElementById('wizSnPass').value.trim();
     const statusBox = document.getElementById('wizApiStatusBox');
-    testSanaeiLive(activeKharejIP, 2053, username, password, statusBox);
+    testSanaeiLive(activeKharejIP, 53008, 'WTy9cJKmxOphyIW78A', username, password, statusBox);
   });
 
   // View 3 Sanaei Test Button
   document.getElementById('btnTestSanaeiLiveView3').addEventListener('click', () => {
     const host = document.getElementById('snHost').value.trim() || activeKharejIP;
-    const port = document.getElementById('snPort').value.trim() || 2053;
+    const port = document.getElementById('snPort').value.trim() || 53008;
+    const basePath = document.getElementById('snBasePath') ? document.getElementById('snBasePath').value.trim() : 'WTy9cJKmxOphyIW78A';
     const username = document.getElementById('snUser').value.trim();
     const password = document.getElementById('snPass').value.trim();
     const statusBox = document.getElementById('apiStatusMessage');
-    testSanaeiLive(host, port, username, password, statusBox);
+    testSanaeiLive(host, port, basePath, username, password, statusBox);
   });
 
   // Wizard Sanaei Batch Automation
@@ -2639,6 +2747,26 @@ ${sub}
       toast('دستور ثبت شد');
     } catch(e) {
       out.textContent = '[ERROR] خطا در اجرای دستور';
+    }
+  }
+
+  // Standalone Local Host Action Runner
+  async function runHostAction(act, role = 'kharej') {
+    const out = document.getElementById('hostActionOutput');
+    if (out) out.textContent = `در حال اجرای دستور ${act} روی سرور... لطفاً شکیبا باشید...`;
+    toast('درخواست به سرور ارسال شد...');
+    try {
+      const res = await fetch('/api/panel/host-action', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: act, role })
+      });
+      const data = await res.json();
+      if (out) out.textContent = `[RESULT]\n${data.output || 'دستور با موفقیت انجام شد'}`;
+      toast(data.ok ? 'دستور با موفقیت در سرور اجرا شد' : 'خطا در اجرای دستور');
+    } catch(e) {
+      if (out) out.textContent = `[ERROR] عدم امکان ارتباط با سرور: ${e.message}`;
+      toast('خطا در ارتباط با سرور');
     }
   }
 
