@@ -1767,9 +1767,15 @@ app.post('/api/panel/host-action', async (req, res) => {
   addLog(`[PANEL HOST ACTION] Request to execute action: ${action} (${role})`);
 
   let cmd = '';
-  if (action === 'install_tunnels') {
+  if (action === 'install_tunnels' || action === 'install_kharej_tunnels') {
     const scriptFile = role === 'iran' ? 'install-iran.sh' : 'install-kharej.sh';
     cmd = `sudo bash ${path.join(__dirname, scriptFile)}`;
+  } else if (action === 'install_iran_tunnels') {
+    cmd = `sudo bash ${path.join(__dirname, 'install-iran.sh')}`;
+  } else if (action === 'restart_tunnels') {
+    cmd = 'sudo systemctl restart t2tunnel.service || sudo systemctl restart t2tunnel';
+  } else if (action === 'status_tunnels') {
+    cmd = 'systemctl status t2tunnel.service --no-pager';
   } else if (action === 'update_panel') {
     cmd = 'cd /opt/mhtunnel-panel && git pull && systemctl restart mhtunnel-panel.service || curl -sSL http://localhost:3000/install-panel.sh | bash';
   } else if (action === 'restart_panel') {

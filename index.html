@@ -990,6 +990,51 @@
     </div>
 
     <!-- ====================================================================
+         TUNNEL DAEMON SERVICE CONTROLLER CARD (فعال‌سازی و کنترل سرویس تانل)
+         ==================================================================== -->
+    <div style="background: #ffffff; border: 2px solid #0f172a; border-radius: var(--r); padding: 18px 22px; margin-bottom: 24px; box-shadow: var(--shadow-md);">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 12px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">
+        <div style="font-size: 15px; font-weight: 900; color: #0f172a; display: flex; align-items: center; gap: 8px;">
+          🚀 مرکز کنترل و فعال‌سازی سرویس تانل‌ها در سرور (<span class="mono" style="font-size:13px; color:#2563eb;">t2tunnel.service</span>)
+        </div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button class="btn btn-accent btn-sm" onclick="runHostAction('restart_tunnels')">
+            🔄 ریستارت و فعال‌سازی سرویس تانل
+          </button>
+          <button class="btn btn-outline btn-sm" onclick="runHostAction('status_tunnels')">
+            📊 استعلام وضعیت زنده دمون
+          </button>
+          <button class="btn btn-solid btn-sm" onclick="runHostAction('install_kharej_tunnels')">
+            ⚙️ نصب/بازسازی ۷ تانل رو سرور خارج
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Command Bar for Iran Relay Activation -->
+      <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:6px; padding:12px 14px; font-size:12.5px;">
+        <div style="font-weight:800; color:#0f172a; margin-bottom:6px;">
+          🇮🇷 دستور راه‌اندازی و اتصال سرور ایران (<span class="mono">95.38.191.217</span>) به سرور خارج (<span class="mono">13.140.87.14</span>):
+        </div>
+        <p style="color:#475569; font-size:12px; margin-bottom:8px;">
+          اگر روی سرور ایران پینگ -۱ms می‌گیرید، علت آن این است که اسکریپت تانل هنوز روی سرور ایران اجرا نشده است. این دستور را کپی و روی سرور ایران بزنید:
+        </p>
+        <div class="code-box-white" style="margin-bottom:8px;">
+          <div class="code-line-white" id="cmdRunIranRelayDirect">curl -fsSL https://raw.githubusercontent.com/dnjebeuifedihwdih/T2HASH-CORE/main/install-iran.sh | sudo KHAREJ_IP="13.140.87.14" IRAN_IP="95.38.191.217" bash</div>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn btn-solid btn-sm" onclick="copyText('cmdRunIranRelayDirect', 'دستور اتصال سرور ایران کپی شد! در سرور ایران پیست کنید.')">
+            📋 کپی دستور فعال‌سازی سرور ایران
+          </button>
+          <button class="btn btn-outline btn-sm" onclick="copyText('cmdRunIranWinDirect', 'دستور ویندوز کپی شد!')">
+            💻 کپی دستور اجرا از داخل ویندوز CMD
+          </button>
+        </div>
+        <div class="code-line-white mono hide" id="cmdRunIranWinDirect" style="margin-top:6px; background:#ffffff; border:1px solid #cbd5e1; padding:6px 10px; border-radius:4px; font-size:11.5px; color:#0f172a;">ssh -t root@95.38.191.217 "curl -fsSL https://raw.githubusercontent.com/dnjebeuifedihwdih/T2HASH-CORE/main/install-iran.sh | sudo KHAREJ_IP=\"13.140.87.14\" IRAN_IP=\"95.38.191.217\" bash"</div>
+      </div>
+      <div id="hostActionOutput" class="code-box-white mono hide" style="margin-top:12px; max-height:250px; overflow-y:auto; font-size:11.5px;"></div>
+    </div>
+
+    <!-- ====================================================================
          VIEW: MULTI-TUNNEL USER CREATOR (ساخت کاربر ۵/۷ تانله در سنایی)
          ==================================================================== -->
     <section class="view-pane" id="pane-user-creator">
@@ -2957,7 +3002,10 @@ ${sub}
   // Standalone Local Host Action Runner
   async function runHostAction(act, role = 'kharej') {
     const out = document.getElementById('hostActionOutput');
-    if (out) out.textContent = `در حال اجرای دستور ${act} روی سرور... لطفاً شکیبا باشید...`;
+    if (out) {
+      out.classList.remove('hide');
+      out.textContent = `در حال اجرای دستور ${act} روی سرور... لطفاً شکیبا باشید...`;
+    }
     toast('درخواست به سرور ارسال شد...');
     try {
       const res = await fetch('/api/panel/host-action', {
@@ -2966,7 +3014,7 @@ ${sub}
         body: JSON.stringify({ action: act, role })
       });
       const data = await res.json();
-      if (out) out.textContent = `[RESULT]\n${data.output || 'دستور با موفقیت انجام شد'}`;
+      if (out) out.textContent = `[RESULT - ${new Date().toLocaleTimeString('fa-IR')}]\n${data.output || 'دستور با موفقیت انجام شد'}`;
       toast(data.ok ? 'دستور با موفقیت در سرور اجرا شد' : 'خطا در اجرای دستور');
     } catch(e) {
       if (out) out.textContent = `[ERROR] عدم امکان ارتباط با سرور: ${e.message}`;
