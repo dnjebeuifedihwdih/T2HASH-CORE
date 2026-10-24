@@ -83,6 +83,7 @@ func main() {
 	dstPort := flag.Int("dstport", 0, "[raw] پورت طرف مقابل")
 	noAutoIPT := flag.Bool("no-auto-iptables", false, "[raw] قوانین iptables رو خودکار اضافه نکن")
 	sni := flag.String("sni", "www.cloudflare.com", "[tls] دامنه‌ی SNI برای شبیه‌سازی HTTPS")
+	clientListen := flag.String("client-listen", "", "[reverse] آدرس listen برای کلاینت‌های کاربر در حالت تانل معکوس")
 	remotes := flag.String("remotes", "", "[tls multi-path] چند سرور با کاما جدا، مثلا ip1:443,ip2:443")
 	wsPath := flag.String("ws-path", "/", "[ws] مسیر WebSocket (باید با CDN یکی باشه)")
 	wsHost := flag.String("ws-host", "", "[ws client] هدر Host / دامنه‌ی پشت CDN")
@@ -262,8 +263,28 @@ func main() {
 			}
 			runClient(*listen, *remote, block)
 		}
+	case "reverse-hub", "reverse-server":
+		if *listen == "" {
+			log.Fatal("[!] reverse-hub نیاز به -listen (آدرس کنترل) داره")
+		}
+		cListen := *clientListen
+		if cListen == "" {
+			cListen = *target // fallback
+		}
+		if cListen == "" {
+			log.Fatal("[!] reverse-hub نیاز به -client-listen (پورت ورودی کاربران) داره")
+		}
+		runReverseHub(*listen, cListen, *sni)
+	case "reverse-bridge", "reverse-client":
+		if *remote == "" {
+			log.Fatal("[!] reverse-bridge نیاز به -remote (آدرس کنترل) داره")
+		}
+		if *target == "" {
+			log.Fatal("[!] reverse-bridge نیاز به -target (مقصد Xray/2500) داره")
+		}
+		runReverseBridge(*remote, *target, *sni)
 	default:
-		log.Fatal("[!] -mode باید server یا client باشه")
+		log.Fatal("[!] -mode باید server, client, reverse-hub یا reverse-bridge باشه")
 	}
 }
 

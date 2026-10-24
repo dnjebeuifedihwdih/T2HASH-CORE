@@ -1,17 +1,20 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# 🛡️ T2HASH TUNNEL - 5-IN-1 MULTI-PROTOCOL SERVER AUTO-INSTALLER
-# Server IP: 13.140.81.175
-# 5 Concurrent Tunnels for Maximum Resilience Against Censorship:
+# 🛡️ T2HASH TUNNEL - 7-IN-1 MULTI-PROTOCOL SERVER AUTO-INSTALLER
+# Kharej Server IP: 13.140.81.175  |  Iran Server IP: 188.121.101.206
+# 7 Concurrent Tunnels for Maximum Resilience (Anti-Censorship + Reverse Intranet):
 #   1) T2-TLS Quantum (Port 4443 -> Inbound 2500)
 #   2) T2-WebSocket CDN (Port 8443 -> Inbound 2501)
 #   3) T2-gRPC Multiplex (Port 8444 -> Inbound 2502)
 #   4) T2-KCP Turbo UDP (Port 4445 -> Inbound 2503)
 #   5) T2-Raw QuantumMux (Port 4446 -> Inbound 2504)
+#   6) T2-Reverse Intranet Bridge (Port 4447 <-> Inbound 2505) [اینترنت ملی / سرور بدون اینترنت]
+#   7) T2-Reverse Access-IP Bypass (Port 4448 <-> Inbound 2506) [آی‌پی اکسس‌شده و لیست سفید]
 # ==============================================================================
 set -euo pipefail
 
 KHAREJ_IP="${KHAREJ_IP:-13.140.81.175}"
+IRAN_IP="${IRAN_IP:-188.121.101.206}"
 PSK_KEY="${PSK_KEY:-t2hash_9f482a17cb03da5e718b45620f3e8291}"
 REPO_URL="https://github.com/dnjebeuifedihwdih/T2HASH-CORE.git"
 REPO_FALLBACK="https://ghproxy.net/https://github.com/dnjebeuifedihwdih/T2HASH-CORE.git"
@@ -23,10 +26,12 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m'
 BOLD='\033[1m'
+WHITE='\033[1;37m'
 
 echo -e "${CYAN}===================================================================${NC}"
-echo -e "${GREEN}${BOLD}  🏛️ PASARGAD · 5-IN-1 MULTI-TUNNEL SERVER INSTALLER${NC}"
-echo -e "  Server IP: ${CYAN}${KHAREJ_IP}${NC}  |  5 Independent Anti-Censorship Tunnels"
+echo -e "${GREEN}${BOLD}  🏛️ mh.tunnel · 7-IN-1 MULTI-TUNNEL SERVER INSTALLER${NC}"
+echo -e "  Server IP: ${CYAN}${KHAREJ_IP}${NC}  |  Iran Peer: ${YELLOW}${IRAN_IP}${NC}"
+echo -e "  Features: 7 Concurrent Anti-DPI & Reverse Intranet Tunnels"
 echo -e "${CYAN}===================================================================${NC}"
 
 if [[ $EUID -ne 0 ]]; then
@@ -96,47 +101,61 @@ if ! git clone "$REPO_URL" "$WORK_DIR" 2>/dev/null; then
   git clone "$REPO_FALLBACK" "$WORK_DIR" || git clone "https://ghproxy.net/$REPO_URL" "$WORK_DIR"
 fi
 
-cd "$WORK_DIR/t2tunnel"
+if [ -d "$WORK_DIR/t2tunnel" ]; then
+  cd "$WORK_DIR/t2tunnel"
+else
+  cd "$WORK_DIR"
+fi
 go mod tidy || true
 go build -trimpath -ldflags '-s -w' -o /usr/local/bin/t2tunnel .
 chmod +x /usr/local/bin/t2tunnel
 
-echo -e "${YELLOW}[5/7] 🔧 Generating Multi-Tunnel Runner Script & Systemd Unit...${NC}"
-cat << 'RUNNER' > /usr/local/bin/t2tunnel-multi-server.sh
+echo -e "${YELLOW}[5/7] 🔧 Generating 7-in-1 Multi-Tunnel Runner Script & Systemd Unit...${NC}"
+cat << RUNNER > /usr/local/bin/t2tunnel-multi-server.sh
 #!/usr/bin/env bash
-trap 'kill $(jobs -p)' EXIT
+trap 'kill \$(jobs -p)' EXIT
 
-PSK="t2hash_9f482a17cb03da5e718b45620f3e8291"
+PSK="${PSK_KEY}"
+IRAN="${IRAN_IP}"
 
-echo "[T2HASH] Starting 5 Concurrent Tunnel Listeners on Server..."
+echo "[T2HASH] Starting 7 Concurrent Tunnel Listeners on Server..."
 
-# 1. TLS Mimicry
-/usr/local/bin/t2tunnel -mode server -transport tls -listen 0.0.0.0:4443 -target 127.0.0.1:2500 -key "$PSK" -sni speedtest.net &
-PID1=$!
+# 1. TLS Mimicry (Anti-DPI)
+/usr/local/bin/t2tunnel -mode server -transport tls -listen 0.0.0.0:4443 -target 127.0.0.1:2500 -key "\$PSK" -sni speedtest.net &
+PID1=\$!
 
 # 2. WebSocket CDN
-/usr/local/bin/t2tunnel -mode server -transport ws -listen 0.0.0.0:8443 -target 127.0.0.1:2501 -key "$PSK" -ws-path /ws &
-PID2=$!
+/usr/local/bin/t2tunnel -mode server -transport ws -listen 0.0.0.0:8443 -target 127.0.0.1:2501 -key "\$PSK" -ws-path /ws &
+PID2=\$!
 
 # 3. gRPC Multiplex
-/usr/local/bin/t2tunnel -mode server -transport tls -listen 0.0.0.0:8444 -target 127.0.0.1:2502 -key "$PSK" -sni www.bing.com &
-PID3=$!
+/usr/local/bin/t2tunnel -mode server -transport tls -listen 0.0.0.0:8444 -target 127.0.0.1:2502 -key "\$PSK" -sni www.bing.com &
+PID3=\$!
 
 # 4. KCP Turbo UDP
-/usr/local/bin/t2tunnel -mode server -transport udp -listen 0.0.0.0:4445 -target 127.0.0.1:2503 -key "$PSK" &
-PID4=$!
+/usr/local/bin/t2tunnel -mode server -transport udp -listen 0.0.0.0:4445 -target 127.0.0.1:2503 -key "\$PSK" &
+PID4=\$!
 
 # 5. Raw TCP Mux
-/usr/local/bin/t2tunnel -mode server -transport tls -listen 0.0.0.0:4446 -target 127.0.0.1:2504 -key "$PSK" -sni cdnjs.cloudflare.com &
-PID5=$!
+/usr/local/bin/t2tunnel -mode server -transport tls -listen 0.0.0.0:4446 -target 127.0.0.1:2504 -key "\$PSK" -sni cdnjs.cloudflare.com &
+PID5=\$!
 
-wait $PID1 $PID2 $PID3 $PID4 $PID5
+# 6. T2-Reverse Intranet Bridge (مخصوص اینترنت ملی و سرور بدون اینترنت)
+# Kharej maintains reverse connection into Iran or accepts reverse push:
+/usr/local/bin/t2tunnel -mode reverse-bridge -remote "\$IRAN:4447" -target 127.0.0.1:2505 -key "\$PSK" -sni speedtest.net &
+PID6=\$!
+
+# 7. T2-Reverse Access-IP Bypass (مخصوص سرور با آی‌پی اکسس‌شده و دامنه‌های مجاز)
+/usr/local/bin/t2tunnel -mode server -transport tls -listen 0.0.0.0:4448 -target 127.0.0.1:2506 -key "\$PSK" -sni divar.ir &
+PID7=\$!
+
+wait \$PID1 \$PID2 \$PID3 \$PID4 \$PID5 \$PID6 \$PID7
 RUNNER
 chmod +x /usr/local/bin/t2tunnel-multi-server.sh
 
 cat << 'EOF' > /etc/systemd/system/t2tunnel.service
 [Unit]
-Description=T2HASH 5-in-1 Multi-Protocol Tunnel (Server)
+Description=T2HASH 7-in-1 Multi-Protocol Tunnel (Server)
 After=network.target network-online.target
 Wants=network-online.target
 
@@ -152,8 +171,8 @@ LimitNOFILE=1000000
 WantedBy=multi-user.target
 EOF
 
-echo -e "${YELLOW}[6/7] 🛡️ Opening All 5 Ports in Firewall...${NC}"
-PORTS=("4443" "8443" "8444" "4445" "4446" "2053" "2500" "2501" "2502" "2503" "2504")
+echo -e "${YELLOW}[6/7] 🛡️ Opening All 7 Ports in Firewall...${NC}"
+PORTS=("4443" "8443" "8444" "4445" "4446" "4447" "4448" "2053" "2500" "2501" "2502" "2503" "2504" "2505" "2506")
 for p in "${PORTS[@]}"; do
   if command -v ufw >/dev/null 2>&1; then
     ufw allow "$p"/tcp >/dev/null 2>&1 || true
@@ -170,13 +189,15 @@ systemctl restart t2tunnel.service
 sleep 2
 if systemctl is-active --quiet t2tunnel; then
   echo -e "\n${GREEN}===================================================================${NC}"
-  echo -e "${GREEN}${BOLD}  ✅ 5 CONCURRENT TUNNELS INSTALLED & ACTIVE ON SERVER!${NC}"
+  echo -e "${GREEN}${BOLD}  ✅ 7 CONCURRENT TUNNELS INSTALLED & ACTIVE ON SERVER!${NC}"
   echo -e "${GREEN}===================================================================${NC}"
-  echo -e "  ${CYAN}1) TLS Quantum:     ${WHITE}Port 4443 (Forward -> 127.0.0.1:2500)${NC}"
-  echo -e "  ${CYAN}2) WebSocket CDN:   ${WHITE}Port 8443 (Forward -> 127.0.0.1:2501)${NC}"
-  echo -e "  ${CYAN}3) gRPC Multiplex:  ${WHITE}Port 8444 (Forward -> 127.0.0.1:2502)${NC}"
-  echo -e "  ${CYAN}4) KCP Turbo UDP:   ${WHITE}Port 4445 (Forward -> 127.0.0.1:2503)${NC}"
-  echo -e "  ${CYAN}5) Raw QuantumMux:  ${WHITE}Port 4446 (Forward -> 127.0.0.1:2504)${NC}"
+  echo -e "  ${CYAN}1) TLS Quantum:            ${WHITE}Port 4443 -> Inbound 2500${NC}"
+  echo -e "  ${CYAN}2) WebSocket CDN:          ${WHITE}Port 8443 -> Inbound 2501${NC}"
+  echo -e "  ${CYAN}3) gRPC Multiplex:         ${WHITE}Port 8444 -> Inbound 2502${NC}"
+  echo -e "  ${CYAN}4) KCP Turbo UDP:          ${WHITE}Port 4445 -> Inbound 2503${NC}"
+  echo -e "  ${CYAN}5) Raw QuantumMux:         ${WHITE}Port 4446 -> Inbound 2504${NC}"
+  echo -e "  ${GREEN}6) Reverse Intranet Bridge:${WHITE}Port 4447 <-> Inbound 2505 (اینترنت ملی/بدون اینترنت)${NC}"
+  echo -e "  ${GREEN}7) Reverse Access-IP Bypass:${WHITE}Port 4448 <-> Inbound 2506 (آی‌پی اکسس‌شده)${NC}"
 else
   echo -e "${RED}[x] Service failed to start. Logs:${NC}"
   journalctl -u t2tunnel -n 25 --no-pager
@@ -189,12 +210,4 @@ if ! systemctl is-active --quiet x-ui 2>/dev/null; then
   bash -c "$(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)" || true
 fi
 
-if systemctl is-active --quiet x-ui 2>/dev/null; then
-  echo -e "${GREEN}[OK] Sanaei (3x-ui) is running!${NC}"
-  echo -e "${CYAN}• 3x-ui Panel URL: http://${KHAREJ_IP}:2053${NC}"
-fi
-
-echo -e "\n${GREEN}${BOLD}===================================================================${NC}"
-echo -e "${YELLOW}👉 NEXT STEP:${NC} Now run the Iran multi-script on your Iran Server (188.121.101.206):"
-echo -e "   ${CYAN}curl -fsSL https://raw.githubusercontent.com/dnjebeuifedihwdih/T2HASH-CORE/main/install-iran.sh | sudo bash${NC}"
-echo -e "${GREEN}===================================================================${NC}\n"
+echo -e "\n${GREEN}${BOLD}🎉 Kharej Server ready! Now run install-iran.sh on your Iran server.${NC}\n"

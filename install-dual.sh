@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# 🛡️ T2HASH TUNNEL - UNIFIED DUAL-SERVER INSTALLER
+# 🛡️ T2HASH TUNNEL - UNIFIED DUAL-SERVER INSTALLER (7-IN-1 ANTI-CENSORSHIP)
 # Works for both Iran Server (188.121.101.206) and Kharej Server (13.140.81.175)
+# Supports: Forward Tunnels, Reverse Intranet Bridge, and Access-IP Bypass
 # ==============================================================================
 set -euo pipefail
 
@@ -17,7 +18,7 @@ cat << 'ART'
            ##     #######  ##  ##  ##  ##  #####    ##  ##
 ART
 echo -e "${N}"
-echo -e "        ${C}T U N N E L${N}   -   Dual Server Anti-DPI Installer v2.4\n"
+echo -e "        ${C}T U N N E L${N}   -   7-in-1 Dual Server & Reverse Intranet v3.0\n"
 
 if [[ $EUID -ne 0 ]]; then
    echo -e "  ${R}[!] Please run as root: sudo bash $0${N}"
@@ -25,8 +26,8 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 echo -e "  ${B}Which server component are you setting up right now?${N}\n"
-echo -e "    ${P}1)${N} ${B}Kharej / Foreign Server${N}  ${C}(13.140.81.175)${N} - Role: SERVER"
-echo -e "    ${P}2)${N} ${B}Iran Relay Server${N}        ${C}(188.121.101.206)${N} - Role: CLIENT"
+echo -e "    ${P}1)${N} ${B}Kharej / Foreign Server${N}  ${C}(13.140.81.175)${N} - Role: SERVER (7 Tunnels + Sanaei Panel)"
+echo -e "    ${P}2)${N} ${B}Iran Relay Server${N}        ${C}(188.121.101.206)${N} - Role: CLIENT & REVERSE HUB (Ports 9000-9006)"
 echo -e "    ${P}3)${N} ${B}Sanaei (3x-ui) Panel${N}     ${C}(Kharej Server)${N} - Xray Core & Web UI"
 echo -e "    ${P}4)${N} Exit\n"
 

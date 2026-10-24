@@ -1,14 +1,16 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# 🛡️ T2HASH TUNNEL - 5-IN-1 MULTI-PROTOCOL IRAN RELAY AUTO-INSTALLER
+# 🛡️ T2HASH TUNNEL - 7-IN-1 MULTI-PROTOCOL IRAN RELAY AUTO-INSTALLER
 # Iran IP: 188.121.101.206 (IPv6: 2a07:3903:0:2::21c)
 # Target Server (Kharej): 13.140.81.175
-# 5 Concurrent Tunnel Listeners on Iran Server:
+# 7 Concurrent Tunnel Listeners on Iran Server:
 #   1) Listen 0.0.0.0:9000 -> Tunnel to Kharej:4443 (TLS Chrome + 4B Fragmentation)
 #   2) Listen 0.0.0.0:9001 -> Tunnel to Kharej:8443 (WebSocket CDN)
 #   3) Listen 0.0.0.0:9002 -> Tunnel to Kharej:8444 (gRPC Multiplex + 2B Frag)
 #   4) Listen 0.0.0.0:9003 -> Tunnel to Kharej:4445 (KCP Turbo UDP)
 #   5) Listen 0.0.0.0:9004 -> Tunnel to Kharej:4446 (Raw QuantumMux)
+#   6) Listen 0.0.0.0:9005 -> Reverse Intranet Bridge (Control :4447) [اینترنت ملی / بدون اینترنت]
+#   7) Listen 0.0.0.0:9006 -> Reverse Access-IP Bypass (Kharej:4448 + SNI divar.ir) [آی‌پی اکسس‌شده]
 # ==============================================================================
 set -euo pipefail
 
@@ -25,10 +27,12 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m'
 BOLD='\033[1m'
+WHITE='\033[1;37m'
 
 echo -e "${CYAN}===================================================================${NC}"
-echo -e "${GREEN}${BOLD}  🏛️ PASARGAD · 5-IN-1 MULTI-TUNNEL IRAN RELAY INSTALLER${NC}"
+echo -e "${GREEN}${BOLD}  🏛️ mh.tunnel · 7-IN-1 MULTI-TUNNEL IRAN RELAY INSTALLER${NC}"
 echo -e "  Iran IP: ${CYAN}${IRAN_IP}${NC}  ===>  Kharej: ${YELLOW}${KHAREJ_IP}${NC}"
+echo -e "  Supports: اینترنت ملی، آی‌پی بدون اینترنت، و سرورهای اکسس‌شده (Access-IP)"
 echo -e "${CYAN}===================================================================${NC}"
 
 if [[ $EUID -ne 0 ]]; then
@@ -98,48 +102,62 @@ if ! git clone "$REPO_URL" "$WORK_DIR" 2>/dev/null; then
   git clone "https://ghproxy.net/$REPO_URL" "$WORK_DIR" || git clone "$REPO_FALLBACK" "$WORK_DIR"
 fi
 
-cd "$WORK_DIR/t2tunnel"
+if [ -d "$WORK_DIR/t2tunnel" ]; then
+  cd "$WORK_DIR/t2tunnel"
+else
+  cd "$WORK_DIR"
+fi
 go mod tidy || true
 go build -trimpath -ldflags '-s -w' -o /usr/local/bin/t2tunnel .
 chmod +x /usr/local/bin/t2tunnel
 
-echo -e "${YELLOW}[5/6] 🔧 Configuring 5 Concurrent Client Relays in Systemd...${NC}"
-cat << 'RUNNER' > /usr/local/bin/t2tunnel-multi-client.sh
+echo -e "${YELLOW}[5/6] 🔧 Configuring 7 Concurrent Client Relays in Systemd...${NC}"
+cat << RUNNER > /usr/local/bin/t2tunnel-multi-client.sh
 #!/usr/bin/env bash
-trap 'kill $(jobs -p)' EXIT
+trap 'kill \$(jobs -p)' EXIT
 
-PSK="t2hash_9f482a17cb03da5e718b45620f3e8291"
-KHAREJ="13.140.81.175"
+PSK="${PSK_KEY}"
+KHAREJ="${KHAREJ_IP}"
 
-echo "[T2HASH] Starting 5 Concurrent Tunnel Relays on Iran..."
+echo "[T2HASH] Starting 7 Concurrent Tunnel Relays on Iran..."
 
 # 1. TLS Quantum: Listen 9000 -> Kharej:4443
-/usr/local/bin/t2tunnel -mode client -transport tls -listen 0.0.0.0:9000 -remote "$KHAREJ:4443" -key "$PSK" -sni speedtest.net -utls -frag 4 &
-PID1=$!
+/usr/local/bin/t2tunnel -mode client -transport tls -listen 0.0.0.0:9000 -remote "\$KHAREJ:4443" -key "\$PSK" -sni speedtest.net -utls -frag 4 &
+PID1=\$!
 
 # 2. WebSocket CDN: Listen 9001 -> Kharej:8443
-/usr/local/bin/t2tunnel -mode client -transport ws -listen 0.0.0.0:9001 -remote "$KHAREJ:8443" -key "$PSK" -ws-path /ws &
-PID2=$!
+/usr/local/bin/t2tunnel -mode client -transport ws -listen 0.0.0.0:9001 -remote "\$KHAREJ:8443" -key "\$PSK" -ws-path /ws &
+PID2=\$!
 
 # 3. gRPC Multiplex: Listen 9002 -> Kharej:8444
-/usr/local/bin/t2tunnel -mode client -transport tls -listen 0.0.0.0:9002 -remote "$KHAREJ:8444" -key "$PSK" -sni www.bing.com -utls -frag 2 &
-PID3=$!
+/usr/local/bin/t2tunnel -mode client -transport tls -listen 0.0.0.0:9002 -remote "\$KHAREJ:8444" -key "\$PSK" -sni www.bing.com -utls -frag 2 &
+PID3=\$!
 
 # 4. KCP Turbo UDP: Listen 9003 -> Kharej:4445
-/usr/local/bin/t2tunnel -mode client -transport udp -listen 0.0.0.0:9003 -remote "$KHAREJ:4445" -key "$PSK" &
-PID4=$!
+/usr/local/bin/t2tunnel -mode client -transport udp -listen 0.0.0.0:9003 -remote "\$KHAREJ:4445" -key "\$PSK" &
+PID4=\$!
 
 # 5. Raw QuantumMux: Listen 9004 -> Kharej:4446
-/usr/local/bin/t2tunnel -mode client -transport tls -listen 0.0.0.0:9004 -remote "$KHAREJ:4446" -key "$PSK" -sni cdnjs.cloudflare.com -utls &
-PID5=$!
+/usr/local/bin/t2tunnel -mode client -transport tls -listen 0.0.0.0:9004 -remote "\$KHAREJ:4446" -key "\$PSK" -sni cdnjs.cloudflare.com -utls &
+PID5=\$!
 
-wait $PID1 $PID2 $PID3 $PID4 $PID5
+# 6. T2-Reverse Intranet Bridge (مخصوص اینترنت ملی و سرور بدون اینترنت)
+# Iran acts as Reverse Hub: Control port 4447 receives Kharej bridge, local 9005 serves clients:
+/usr/local/bin/t2tunnel -mode reverse-hub -listen 0.0.0.0:4447 -client-listen 0.0.0.0:9005 -key "\$PSK" -sni speedtest.net &
+PID6=\$!
+
+# 7. T2-Reverse Access-IP Bypass (مخصوص سرورهای اکسس‌شده با دامنه‌های مجاز داخلی)
+# Listen on 9006 and connect outbound with domestic SNI divar.ir:
+/usr/local/bin/t2tunnel -mode client -transport tls -listen 0.0.0.0:9006 -remote "\$KHAREJ:4448" -key "\$PSK" -sni divar.ir -utls -frag 4 &
+PID7=\$!
+
+wait \$PID1 \$PID2 \$PID3 \$PID4 \$PID5 \$PID6 \$PID7
 RUNNER
 chmod +x /usr/local/bin/t2tunnel-multi-client.sh
 
 cat << 'EOF' > /etc/systemd/system/t2tunnel.service
 [Unit]
-Description=T2HASH 5-in-1 Multi-Protocol Relay (Client)
+Description=T2HASH 7-in-1 Multi-Protocol Relay (Client)
 After=network.target network-online.target
 Wants=network-online.target
 
@@ -155,8 +173,8 @@ LimitNOFILE=1000000
 WantedBy=multi-user.target
 EOF
 
-echo -e "${YELLOW}[6/6] 🛡️ Opening User Listen Ports (9000-9004) & Starting Service...${NC}"
-PORTS=("9000" "9001" "9002" "9003" "9004")
+echo -e "${YELLOW}[6/6] 🛡️ Opening User Listen Ports (9000-9006, 4447) & Starting Service...${NC}"
+PORTS=("9000" "9001" "9002" "9003" "9004" "9005" "9006" "4447")
 for p in "${PORTS[@]}"; do
   if command -v ufw >/dev/null 2>&1; then
     ufw allow "$p"/tcp >/dev/null 2>&1 || true
@@ -173,21 +191,20 @@ systemctl restart t2tunnel.service
 sleep 2
 if systemctl is-active --quiet t2tunnel; then
   echo -e "\n${GREEN}===================================================================${NC}"
-  echo -e "${GREEN}${BOLD}  ✅ 5 CONCURRENT RELAY PORTS ACTIVE ON IRAN SERVER!${NC}"
+  echo -e "${GREEN}${BOLD}  ✅ 7 CONCURRENT RELAY PORTS ACTIVE ON IRAN SERVER!${NC}"
   echo -e "${GREEN}===================================================================${NC}"
-  echo -e "  ${CYAN}1) Port 9000: ${WHITE}T2-TLS Quantum (speedtest.net + 4B Frag)${NC}"
-  echo -e "  ${CYAN}2) Port 9001: ${WHITE}T2-WebSocket CDN (Cloudflare CDN Ready)${NC}"
-  echo -e "  ${CYAN}3) Port 9002: ${WHITE}T2-gRPC Multiplex (Bing SNI + 2B Frag)${NC}"
-  echo -e "  ${CYAN}4) Port 9003: ${WHITE}T2-KCP Turbo UDP (Low Latency / Packet Loss Shield)${NC}"
-  echo -e "  ${CYAN}5) Port 9004: ${WHITE}T2-Raw QuantumMux (Cloudflare CDNJS SNI)${NC}"
-  echo -e ""
-  echo -e "${YELLOW}🔍 Handshake Check to Kharej (${KHAREJ_IP}):${NC}"
-  for p in "4443" "8443" "8444"; do
-    if timeout 2 bash -c "</dev/tcp/${KHAREJ_IP}/${p}" 2>/dev/null; then
-      echo -e "   ${GREEN}[OK] Port ${p} is reachable!${NC}"
-    fi
-  done
-  echo -e "\n${GREEN}${BOLD}🎉 All 5 Tunnels Running Concurrently! Use the Web Console to get all 5 VLESS links.${NC}\n"
+  echo -e "  ${CYAN}1) TLS Quantum:            ${WHITE}Port 9000 -> Kharej:4443${NC}"
+  echo -e "  ${CYAN}2) WebSocket CDN:          ${WHITE}Port 9001 -> Kharej:8443${NC}"
+  echo -e "  ${CYAN}3) gRPC Multiplex:         ${WHITE}Port 9002 -> Kharej:8444${NC}"
+  echo -e "  ${CYAN}4) KCP Turbo UDP:          ${WHITE}Port 9003 -> Kharej:4445${NC}"
+  echo -e "  ${CYAN}5) Raw QuantumMux:         ${WHITE}Port 9004 -> Kharej:4446${NC}"
+  echo -e "  ${GREEN}6) Reverse Intranet Bridge:${WHITE}Port 9005 (ورودی کاربر در اینترنت ملی / بدون اینترنت)${NC}"
+  echo -e "  ${GREEN}7) Reverse Access-IP Bypass:${WHITE}Port 9006 (ورودی کاربر برای سرور اکسس‌شده و SNI ملی)${NC}"
+  echo -e "-------------------------------------------------------------------"
+  echo -e "  💡 ${YELLOW}کلاینت‌های کاربران شما (V2RayN / Nekoray / Hiddify):${NC}"
+  echo -e "     آدرس سرور را ${CYAN}${IRAN_IP}${NC} قرار دهید و یکی از پورت‌های فوق را انتخاب نمایید."
+  echo -e "     برای شرایط قطعی اینترنت ملی، پورت ${GREEN}9005${NC} یا ${GREEN}9006${NC} را تنظیم کنید."
+  echo -e "${GREEN}===================================================================${NC}\n"
 else
   echo -e "${RED}[x] Service failed to start. Logs:${NC}"
   journalctl -u t2tunnel -n 25 --no-pager

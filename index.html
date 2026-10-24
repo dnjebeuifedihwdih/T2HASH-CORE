@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>mh.tunnel · سامانه جامع تانل و پروکسی ضد فیلترینگ</title>
-  <meta name="description" content="سامانه هوشمند تانل ضد فیلترینگ با پشتیبانی از هر جفت آی‌پی دلخواه، ماتریس ۵ تونل همزمان، اتوماسیون پنل سنایی، مخزن اسکریپت‌ها و راهنمای گام‌به‌گام مشتری">
+  <meta name="description" content="سامانه جامع تانل و پروکسی ضد فیلترینگ با ماتریس ۷ تونل همزمان، تانل معکوس اینترنت ملی (سرور بدون اینترنت)، بای‌پس آی‌پی اکسس‌شده و اتوماسیون پنل سنایی">
   <meta property="og:title" content="mh.tunnel · سامانه جامع تانل و پروکسی ضد فیلترینگ">
-  <meta property="og:description" content="سامانه هوشمند تانل ضد فیلترینگ با پشتیبانی از هر جفت آی‌پی دلخواه، ماتریس ۵ تونل همزمان، اتوماسیون پنل سنایی، مخزن اسکریپت‌ها و راهنمای گام‌به‌گام مشتری">
+  <meta property="og:description" content="سامانه جامع تانل و پروکسی ضد فیلترینگ با ماتریس ۷ تونل همزمان، تانل معکوس اینترنت ملی (سرور بدون اینترنت)، بای‌پس آی‌پی اکسس‌شده و اتوماسیون پنل سنایی">
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -733,6 +733,93 @@
       flex-shrink: 0;
     }
     .qr-box-white img { width: 100%; height: 100%; display: block; }
+
+    /* Interactive Switch Toggle */
+    .switch-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .switch-ui {
+      width: 38px;
+      height: 22px;
+      background: #cbd5e1;
+      border-radius: 999px;
+      position: relative;
+      transition: background 0.2s ease;
+      flex-shrink: 0;
+    }
+    .switch-ui::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      width: 18px;
+      height: 18px;
+      background: #ffffff;
+      border-radius: 50%;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+      transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .switch-wrap.active .switch-ui {
+      background: var(--success);
+    }
+    .switch-wrap.active .switch-ui::after {
+      transform: translateX(-16px);
+    }
+    .switch-lbl {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--ink-dim);
+    }
+
+    /* Sanaei Table */
+    .sanaei-table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin-top: 14px;
+      background: #ffffff;
+    }
+    table.sanaei-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+      text-align: right;
+    }
+    table.sanaei-table th {
+      background: var(--bg);
+      padding: 10px 14px;
+      font-weight: 800;
+      color: var(--ink-dim);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    table.sanaei-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    table.sanaei-table tr:last-child td { border-bottom: none; }
+    table.sanaei-table tr:hover td { background: var(--card-hover); }
+
+    /* Hardware stat card */
+    .stat-badge-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .stat-badge {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 12px;
+    }
+    .stat-badge-title { font-size: 11px; color: var(--ink-muted); font-weight: 600; }
+    .stat-badge-val { font-family: var(--mono); font-size: 14px; font-weight: 800; color: var(--ink); margin-top: 2px; }
   </style>
 </head>
 <body>
@@ -759,8 +846,8 @@
 
       <button class="nav-btn" data-tab="multi-tunnels">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-        ماتریس ۵ تونل همزمان
-        <span class="nav-badge">ضد قطعی ملی</span>
+        ماتریس ۷ تونل همزمان
+        <span class="nav-badge">معکوس و اینترنت ملی</span>
       </button>
 
       <button class="nav-btn" data-tab="scripts-vault">
@@ -771,7 +858,14 @@
 
       <button class="nav-btn" data-tab="sanaei-api">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-        اتوماسیون سنایی (3x-ui)
+        مدیریت همه‌کاره سنایی
+        <span class="nav-badge" style="background:#fee2e2; color:#b91c1c;">API کامل</span>
+      </button>
+
+      <button class="nav-btn" data-tab="arvan-guide">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
+        راهنمای آروان کلاد و سنایی
+        <span class="nav-badge" style="background:#fef3c7; color:#b45309;">CDN و تانل</span>
       </button>
 
       <button class="nav-btn" data-tab="quick-deploy">
@@ -1067,6 +1161,18 @@
               <button class="btn btn-outline btn-sm" onclick="copyFullIranScript()">کپی سورس کامل (بدون نیاز به اینترنت)</button>
               <a href="/scripts/iran.sh" id="linkDownloadIranSh" download="install-iran.sh" class="btn btn-outline btn-sm">دانلود فایل .sh</a>
             </div>
+          <!-- Dedicated Box: Reverse Intranet & Access-IP Guide -->
+          <div style="background: #f0fdf4; border: 1.5px solid #86efac; border-radius: var(--r); padding: 16px 18px; margin-top: 14px;">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+              <div style="background:#16a34a; color:#fff; border-radius:6px; width:28px; height:28px; display:grid; place-items:center; font-weight:800; font-size:14px;">🔄</div>
+              <div style="font-weight:900; font-size:14px; color:#14532d;">راهنمای ویژه شرایط قطعی اینترنت ملی، سرور بدون اینترنت و آی‌پی اکسس‌شده</div>
+            </div>
+            <div style="font-size:12.5px; color:#166534; line-height:1.8;">
+              <b>۱. شرایط قطعی کامل اینترنت بین‌الملل یا سرور ایران بدون اینترنت خارجی (National Intranet Cutoff):</b><br>
+              در شرایطی که اینترنت بین‌الملل قطع است و سرور ایران نمی‌تواند بسته‌ای به خارج ارسال کند، از <b>پورت ۹۰۰۵ (تانل معکوس اینترنت ملی)</b> استفاده نمایید. در این متد، سرور خارج به صورت معکوس از بیرون به سرور ایران پل می‌زند و ترافیک کاربر روی پورت ۹۰۰۵ را بدون نیاز به باز بودن اینترنت خارجی ایران به سرور خارج و سپس اینترنت آزاد هدایت می‌کند.<br>
+              <b>۲. سرورهای با آی‌پی اکسس‌شده و لیست سفید دامنه‌ها (Access-IP / Whitelist Bypass):</b><br>
+              روی سرورهایی که فقط اجازه اتصال به دامنه‌ها و آی‌پی‌های تاییدشده داخلی دارند، از <b>پورت ۹۰۰۶</b> استفاده کنید. این تانل با جعل SNI سایت‌های مجاز ایرانی (<span class="mono">divar.ir / splus.ir</span>) و شکستن بسته‌ها به قطعات ۴ بایتی، فایروال لایه ۷ را فریب داده و اینترنت کامل را در اختیارتان می‌گذارد.
+            </div>
           </div>
         </div>
       </div>
@@ -1151,29 +1257,43 @@
     </section>
 
     <!-- ====================================================================
-         VIEW 1: 5-TUNNEL MATRIX (ماتریس ۵ تونل همزمان ضد قطعی ملی)
+         VIEW 1: 7-TUNNEL MATRIX (ماتریس ۷ تونل همزمان ضد قطعی ملی و معکوس)
          ==================================================================== -->
     <section class="view-pane" id="pane-multi-tunnels">
       <div class="page-title-box">
-        <div class="page-kicker">5-IN-1 ANTI-CENSORSHIP MATRIX / mh.tunnel</div>
-        <h1 class="page-heading">ماتریس ۵ تونل همزمان و وضعیت لایو</h1>
-        <p class="page-lead">اجرای همزمان ۵ پروتکل مستقل ضد DPI روی پورت‌های مجزا با پایش وضعیت، پینگ و هندرشیک اختصاصی برای هر تونل.</p>
+        <div class="page-kicker">7-IN-1 ANTI-CENSORSHIP MATRIX & REVERSE INTRANET / mh.tunnel</div>
+        <h1 class="page-heading">ماتریس ۷ تونل همزمان و وضعیت لایو</h1>
+        <p class="page-lead">اجرای همزمان ۷ پروتکل مستقل ضد DPI، تانل معکوس اینترنت ملی (بدون نیاز به اینترنت آزاد سرور ایران) و دور زدن سرورهای اکسس‌شده (لیست سفید).</p>
       </div>
 
       <!-- Action Head Bar -->
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:12px;">
         <div style="font-size:13.5px; font-weight:700; color:var(--ink-dim);">
-          ۵ پروتکل فعال به صورت همزمان (بدون تداخل با لیسنرهای مجزا)
+          ۷ پروتکل فعال به صورت همزمان (۵ تونل فوروارد + ۲ تانل معکوس اینترنت ملی و اکسس‌شده)
         </div>
-        <div style="display:flex; gap:10px;">
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn btn-outline btn-sm" id="btnEnableAllTunnels">
+            🟢 فعال‌سازی همه ۷ تانل
+          </button>
+          <button class="btn btn-outline btn-sm" id="btnDisableAllTunnels" style="color:var(--ink-muted);">
+            ⚪ خاموش کردن همه
+          </button>
           <button class="btn btn-accent btn-sm" id="btnTestAllMatrixTunnels">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-            تست پینگ و وضعیت هر ۵ تونل
+            تست پینگ و وضعیت هر ۷ تونل
           </button>
           <button class="btn btn-outline btn-sm" id="btnRegenAllMatrix">
             بازتولید کانفیگ‌ها
           </button>
         </div>
+      </div>
+
+      <!-- Info Banner on Toggle & First Install Active State -->
+      <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:6px; padding:10px 14px; margin-bottom:16px; font-size:12px; color:#1e40af; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <div>
+          <b>ℹ️ رفتار کلیدهای فعال/غیرفعال:</b> تمامی ۷ تانل و اینباندها با اولین نصب به صورت پیش‌فرض <b>روشن و فعال</b> هستند. در صورت تمایل می‌توانید با سوئیچ هر کارت، تانل دلخواه را خاموش کنید تا از اشتراک سابسکریپشن کلاینت‌ها حذف شود.
+        </div>
+        <span id="activeTunnelsCounterBadge" class="nav-badge" style="background:#2563eb; color:#ffffff; font-size:11px;">۷ از ۷ تانل فعال</span>
       </div>
 
       <!-- 5 Interactive Tunnel Matrix Cards -->
@@ -1224,18 +1344,46 @@
     </section>
 
     <!-- ====================================================================
-         VIEW 3: SANAEI API & INBOUND AUTOMATION (اتوماسیون سنایی)
+         VIEW 3: SANAEI ALL-IN-ONE MASTER CENTER (مدیریت همه‌کاره سنایی)
          ==================================================================== -->
     <section class="view-pane" id="pane-sanaei-api">
       <div class="page-title-box">
-        <div class="page-kicker">sanaei 3x-ui / automated api integration</div>
-        <h1 class="page-heading">اتصال خودکار به API سنایی و ساخت اینباند تونل</h1>
-        <p class="page-lead">مشخصات پنل سنایی (3x-ui) را وارد کن؛ پنل اینباند را روی سرور خارج می‌سازد و لینک اشتراک تونل‌شده ایران را تحویل می‌دهد.</p>
+        <div class="page-kicker">sanaei 3x-ui / all-in-one live control center</div>
+        <h1 class="page-heading">مرکز کنترل همه‌کاره و مدیریت API سنایی (3x-ui)</h1>
+        <p class="page-lead">مدیریت کامل اینباندها، سوییچ فعال/غیرفعال، مانیتورینگ حجم مصرفی، مصرف رم و CPU سرور و ساخت اتوماتیک هر ۷ اینباند.</p>
+      </div>
+
+      <!-- Live Server Hardware Status (CPU, RAM, Xray) -->
+      <div id="snHardwareCard" class="card-clean hide" style="margin-bottom:18px;">
+        <div class="card-head">
+          <div class="card-title-text"><span class="bullet"></span>وضعیت زنده سخت‌افزار سرور خارج و هسته Xray</div>
+          <span class="status-pill status-pill-active" id="snXrayStatusPill">Xray: Running</span>
+        </div>
+        <div class="card-body">
+          <div class="stat-badge-grid">
+            <div class="stat-badge">
+              <div class="stat-badge-title">مصرف پردازنده (CPU)</div>
+              <div class="stat-badge-val" id="snCpuVal">--%</div>
+            </div>
+            <div class="stat-badge">
+              <div class="stat-badge-title">حافظه رم (RAM)</div>
+              <div class="stat-badge-val" id="snMemVal">-- / --</div>
+            </div>
+            <div class="stat-badge">
+              <div class="stat-badge-title">فضای دیسک (Disk)</div>
+              <div class="stat-badge-val" id="snDiskVal">-- / --</div>
+            </div>
+            <div class="stat-badge">
+              <div class="stat-badge-title">مدت روشنی (Uptime)</div>
+              <div class="stat-badge-val" id="snUptimeVal" style="font-size:12px;">--</div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="card-clean">
         <div class="card-head">
-          <div class="card-title-text"><span class="bullet"></span>مشخصات پنل سنایی (سرور خارج)</div>
+          <div class="card-title-text"><span class="bullet"></span>احراز هویت و دسترسی به API سنایی</div>
           <span style="font-family:var(--mono); font-size:11.5px; color:var(--ink-muted);" id="snTargetIpBadge">TARGET: 13.140.81.175</span>
         </div>
         <div class="card-body">
@@ -1261,25 +1409,65 @@
             </div>
           </div>
 
-          <div style="display:flex; gap:12px; margin-top:8px; flex-wrap:wrap;">
+          <div style="display:flex; gap:10px; margin-top:8px; flex-wrap:wrap;">
             <button class="btn btn-outline" id="btnTestSanaeiLiveView3">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-              تست زنده اتصال به پنل سنایی
+              تست زنده اتصال و ورود
             </button>
-            <button class="btn btn-solid" id="btnAutoCreateInbound">
+            <button class="btn btn-solid" id="btnRefreshInboundsList">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+              دریافت زنده اینباندهای سنایی
+            </button>
+            <button class="btn btn-accent" id="btnAutoCreateInbound">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-              ورود به سنایی و ساخت خودکار اینباند
+              ساخت خودکار هر ۷ اینباند در سنایی
             </button>
-            <button class="btn btn-outline" id="btnQuickOffline">
-              تولید آنی کانفیگ و لینک (آفلاین بدون لاگین)
+            <button class="btn btn-outline" id="btnResetAllTraffics" style="color:var(--danger); border-color:var(--border-dark);">
+              🧹 صفر کردن حجم همه اینباندها
             </button>
           </div>
           <div id="apiStatusMessage" class="hide" style="margin-top:16px; padding:12px; background:var(--bg); border:1px solid var(--border); border-radius:6px; font-size:12.5px; line-height:1.7;"></div>
         </div>
       </div>
 
+      <!-- Live Inbounds Table Card -->
+      <div class="card-clean" id="snInboundsTableCard" style="margin-top:20px;">
+        <div class="card-head">
+          <div class="card-title-text">
+            <span class="bullet"></span>
+            لیست اینباندهای فعال در پنل سنایی (کنترل کلید فعال/غیرفعال و ترافیک مصرفی)
+          </div>
+          <span class="nav-badge" id="snInboundsCounterBadge" style="background:#0f172a; color:#fff;">در انتظار فراخوانی</span>
+        </div>
+        <div class="card-body" style="padding-top:10px;">
+          <div class="sanaei-table-wrap">
+            <table class="sanaei-table">
+              <thead>
+                <tr>
+                  <th>شناسه (ID)</th>
+                  <th>عنوان (Remark)</th>
+                  <th>پورت سنایی</th>
+                  <th>پروتکل</th>
+                  <th>دانلود / آپلود</th>
+                  <th>تعداد کلاینت</th>
+                  <th>وضعیت</th>
+                  <th>عملیات</th>
+                </tr>
+              </thead>
+              <tbody id="snInboundsTableBody">
+                <tr>
+                  <td colspan="8" style="text-align:center; color:var(--ink-muted); padding:24px;">
+                    رمز عبور سنایی را در کادر بالا وارد کرده و دکمه <b>«دریافت زنده اینباندهای سنایی»</b> یا <b>«ساخت خودکار هر ۷ اینباند»</b> را بزنید.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
       <!-- Result VLESS Box -->
-      <div id="resultBox" class="card-clean hide">
+      <div id="resultBox" class="card-clean hide" style="margin-top:20px;">
         <div class="card-head">
           <div class="card-title-text"><span class="bullet"></span>کانفیگ و لینک اشتراک تولیدشده</div>
           <span class="status-pill status-pill-active">آماده اتصال</span>
@@ -1311,6 +1499,104 @@
                 با دوربین گوشی یا نرم‌افزار v2rayNG اسکن کنید تا کانفیگ بلافاصله ثبت شود.
               </p>
             </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         VIEW: ARVANCLOUD & SANAEI MASTER GUIDE (راهنمای جامع آروان کلاد و سنایی)
+         ==================================================================== -->
+    <section class="view-pane" id="pane-arvan-guide">
+      <div class="page-title-box">
+        <div class="page-kicker">ARVANCLOUD CDN & 3X-UI INTEGRATION MASTER MANUAL</div>
+        <h1 class="page-heading">راهنمای جامع راه‌اندازی سرور ایران در آروان کلاد و سنایی</h1>
+        <p class="page-lead">آموزش گام‌به‌گام اتصال دامنه، فعال‌سازی CDN آروان کلاد، تنظیم پورت‌ها و ست کردن اینباند در سنایی برای بیشترین پایداری در اینترنت ملی.</p>
+      </div>
+
+      <!-- Part 1: ArvanCloud Guide -->
+      <div class="wizard-step-card">
+        <div class="wizard-step-header">
+          <div class="wizard-step-number">۱</div>
+          <div>
+            <div class="wizard-step-title">بخش اول: تنظیمات سرور ایران در پنل آروان کلاد (ArvanCloud)</div>
+            <div class="wizard-step-subtitle">شیلد ضد فیلترینگ، توزیع ترافیک روی آی‌پی‌های داخلی و پورت‌های وب</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <p style="font-size:13px; color:var(--ink-dim); line-height:1.8; margin-bottom:14px;">
+            آروان کلاد بزرگ‌ترین شبکه توزیع محتوا (CDN) در ایران است. با قرار دادن دامنه خود پشت آروان کلاد، آی‌پی سرور اصلی شما کاملاً مخفی می‌ماند و فیلترینگ نمی‌تواند سرور را مسدود کند.
+          </p>
+
+          <div style="background:var(--bg); border:1px solid var(--border); border-radius:6px; padding:14px; margin-bottom:14px;">
+            <div style="font-weight:800; font-size:13px; color:var(--ink); margin-bottom:6px;">مراحل راه‌اندازی در پنل آروان کلاد:</div>
+            <ol style="font-size:12.5px; color:var(--ink-dim); line-height:1.9; padding-inline-start:20px;">
+              <li>وارد پنل کاربری <b>آروان کلاد (ArvanCloud.ir)</b> شوید و دامنه‌تان را در بخش <b>CDN / شبکه توزیع محتوا</b> ثبت کنید.</li>
+              <li>در بخش <b>مدیریت رکوردهای DNS</b>، یک رکورد از نوع <b>A Record</b> بسازید:
+                <br>• <b>عنوان (Name):</b> مثلاً <span class="mono">tunnel</span> یا <span class="mono">cdn</span>
+                <br>• <b>مقدار (Value):</b> آی‌پی سرور ایران خودتان (<span class="mono">188.121.101.206</span>)
+              </li>
+              <li><b>وضعیت ابر (Proxy Status):</b> کلید ابر آروان را <b>روشن (زرد/فعال)</b> کنید. با این کار ترافیک ابتدا به سرورهای آروان در ایران می‌رسد و سپس به سرور شما فوروارد می‌شود.</li>
+              <li><b>پورت‌های مجاز CDN آروان:</b> توجه داشته باشید که آروان کلاد روی حالت ابر روشن، فقط پورت‌های استاندارد وب را عبور می‌دهد:
+                <br>• <b>پورت‌های HTTPS مجاز:</b> <span class="mono">443, 8443, 2053, 2083, 2087, 2096</span>
+                <br>• <b>پورت‌های HTTP مجاز:</b> <span class="mono">80, 8080, 8880, 2052, 2082, 2086</span>
+              </li>
+              <li><b>گواهی SSL آروان:</b> در بخش تنظیمات HTTPS آروان کلاد، گزینه <b>SSL رایگان آروان</b> را فعال کنید تا ارتباط کلاینت با CDN کاملاً رمزنگاری شود.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <!-- Part 2: Sanaei Configuration for CDN -->
+      <div class="wizard-step-card">
+        <div class="wizard-step-header">
+          <div class="wizard-step-number">۲</div>
+          <div>
+            <div class="wizard-step-title">بخش دوم: تنظیمات اینباند در پنل سنایی (3x-ui) برای آروان و کلودفلر</div>
+            <div class="wizard-step-subtitle">تنظیم پروتکل VLESS با بستر WebSocket یا gRPC و هدر Host دامنه</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div style="font-size:13px; color:var(--ink-dim); line-height:1.8; margin-bottom:14px;">
+            وقتی تانل شماره ۲ (پورت ۹۰۰۱ در ایران و پورت ۲۵۰۱ در سنایی) را انتخاب می‌کنید، اینباند در سنایی باید دقیقاً به شکل زیر تنظیم شده باشد:
+          </div>
+
+          <div style="background:#0f172a; color:#f8fafc; border-radius:6px; padding:16px; font-family:var(--mono); font-size:12px; direction:ltr; text-align:left; line-height:1.8; margin-bottom:14px;">
+            Protocol: vless<br>
+            Port: 2501 (یا هر پورتی که به تانل خارج فوروارد شده)<br>
+            Transport: ws (WebSocket) یا grpc<br>
+            Path: /ws (دقیقاً همان مسیری که در آروان مجاز شده)<br>
+            Host: your-arvan-domain.ir (دامنه‌ای که در آروان ثبت کرده‌اید)<br>
+            Security: none (چون آروان کلاد و تانل خودشان رمزنگاری را انجام می‌دهند)
+          </div>
+
+          <p style="font-size:12.5px; color:var(--ink-dim); line-height:1.7;">
+            💡 <b>نکته مهم:</b> پنل mh.tunnel ما با زدن دکمه «ساخت خودکار هر ۷ اینباند در سنایی»، این تنظیمات را به صورت خودکار و بدون نیاز به ورود دستی در سنایی اعمال می‌کند!
+          </p>
+        </div>
+      </div>
+
+      <!-- Part 3: What to do during National Intranet -->
+      <div class="wizard-step-card">
+        <div class="wizard-step-header">
+          <div class="wizard-step-number">۳</div>
+          <div>
+            <div class="wizard-step-title">بخش سوم: راهکار قطعی در روزهای قطع اینترنت بین‌الملل (اینترنت ملی)</div>
+            <div class="wizard-step-subtitle">اقدام سریع و نجات‌بخش با تانل‌های معکوس ۹۰۰۵ و ۹۰۰۶</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div style="background:#fef2f2; border:1px solid #fecaca; border-radius:6px; padding:14px; margin-bottom:14px; font-size:12.5px; color:#991b1b; line-height:1.8;">
+            <b>⚠️ در زمان قطعی کامل اینترنت بین‌الملل چه اتفاقی می‌افتد؟</b><br>
+            اگر اینترنت بین‌الملل کلاً قطع شود، CDN آروان کلاد یا کلودفلر نمی‌تواند بسته‌ها را به سرور خارج ببرد، چون ارتباط بین دیتاسنترهای داخلی و خارجی مسدود می‌شود.
+          </div>
+
+          <div style="font-size:13px; color:var(--ink-dim); line-height:1.9;">
+            <b>راهکار فوری:</b> در آن روز، فقط لینک‌های تانل شماره ۶ و ۷ را به مشتریان بدهید:
+            <ul style="padding-inline-start:20px; margin-top:8px;">
+              <li><b>کانفیگ شماره ۶ (پورت ۹۰۰۵ - Reverse Intranet Bridge):</b> بدون نیاز به CDN و بدون نیاز به اینکه سرور ایران به خارج وصل شود، سرور خارج به صورت معکوس به ایران وصل است و ترافیک را به بیرون می‌کشد.</li>
+              <li><b>کانفیگ شماره ۷ (پورت ۹۰۰۶ - Whitelist SNI Bypass):</b> دامنه SNI روی سایت‌های معاف از فیلتر مثل <span class="mono">divar.ir</span> یا <span class="mono">splus.ir</span> تنظیم شده و حتی در سخت‌ترین وضعیت‌ها عبور می‌کند.</li>
+            </ul>
           </div>
         </div>
       </div>
@@ -1656,29 +1942,66 @@ WantedBy=multi-user.target</pre>
     }
   }
 
+  function formatBytes(bytes) {
+    if (!bytes || bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
+
   function renderMatrix(tunnels, subBase64) {
     const container = document.getElementById('matrixGridContainer');
     if (!container) return;
 
     container.innerHTML = '';
+    let activeCount = 0;
+
     tunnels.forEach((t, idx) => {
+      const isEnabled = t.enabled !== false;
+      if (isEnabled) activeCount++;
+
       const card = document.createElement('div');
       card.className = 'tunnel-card';
       card.id = `tunnel-card-${idx}`;
+      if (!isEnabled) {
+        card.style.opacity = '0.65';
+        card.style.borderStyle = 'dashed';
+      }
+
+      const tagBadge = t.tag ? `<span class="nav-badge" style="background:#dcfce7; color:#15803d; font-size:10px; margin-top:2px;">${t.tag}</span>` : '';
+      const survivalBadge = t.survivalRating ? `<span class="nav-badge" style="background:#eff6ff; color:#1d4ed8; font-size:10px;">${t.survivalRating}</span>` : '';
+      const stealthValue = idx === 0 ? '99.8%' : (idx === 1 ? '98.5%' : (idx === 2 ? '99.1%' : (idx === 3 ? '97.6%' : (idx === 4 ? '99.5%' : (idx === 5 ? '100% (معکوس ملی)' : '100% (SNI مجاز)')))));
+
       card.innerHTML = `
         <div>
           <div class="tunnel-card-head">
             <div>
               <div class="tunnel-name">${t.name}</div>
-              <div style="font-size:11px; color:var(--ink-muted); margin-top:2px;">پروتکل شماره ${idx + 1}</div>
+              <div style="display:flex; align-items:center; gap:6px; margin-top:4px; flex-wrap:wrap;">
+                <span style="font-size:11px; color:var(--ink-muted);">پروتکل شماره ${idx + 1}</span>
+                ${tagBadge}
+                ${survivalBadge}
+              </div>
             </div>
-            <span class="status-pill status-pill-idle" id="t-status-${idx}">⚪ بررسی نشده (کلیک برای تست)</span>
+            <span class="status-pill ${isEnabled ? 'status-pill-idle' : 'status-pill-danger'}" id="t-status-${idx}">
+              ${isEnabled ? '⚪ آماده تست پینگ' : 'خاموش / غیرفعال'}
+            </span>
+          </div>
+
+          <!-- Individual Toggle Switch Bar -->
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; background:var(--bg); border:1px solid var(--border); border-radius:6px; margin-bottom:12px;">
+            <div style="font-size:12px; font-weight:700; color:var(--ink);">وضعیت فعالیت این تانل:</div>
+            <div class="switch-wrap ${isEnabled ? 'active' : ''}" onclick="toggleTunnelState(${idx}, '${t.id}')">
+              <div class="switch-ui"></div>
+              <span class="switch-lbl">${isEnabled ? 'روشن (فعال)' : 'خاموش (غیرفعال)'}</span>
+            </div>
           </div>
 
           <div class="tunnel-telemetry-row">
             <span>پینگ: <b style="color:var(--ink-muted);" id="t-ping-${idx}">-- ms</b></span>
-            <span>سوکت: <b style="color:var(--ink-muted);" id="t-sock-${idx}">آماده تست</b></span>
-            <span>DPI Stealth: <b style="color:var(--ink-dim);">${idx === 0 ? '99.8%' : (idx === 1 ? '98.5%' : (idx === 2 ? '99.1%' : (idx === 3 ? '97.6%' : '99.5%')))}</b></span>
+            <span>سوکت: <b style="color:var(--ink-muted);" id="t-sock-${idx}">${isEnabled ? 'آماده تست' : 'غیرفعال'}</b></span>
+            <span>استتار DPI: <b style="color:var(--ink-dim);">${stealthValue}</b></span>
           </div>
 
           <div class="tunnel-ports-row">
@@ -1702,6 +2025,9 @@ WantedBy=multi-user.target</pre>
       `;
       container.appendChild(card);
     });
+
+    const badge = document.getElementById('activeTunnelsCounterBadge');
+    if (badge) badge.textContent = `${activeCount} از ۷ تانل فعال`;
 
     // Update wizard outputs
     if (subBase64) {
@@ -1771,6 +2097,213 @@ WantedBy=multi-user.target</pre>
     } finally {
       if (btnProbe) btnProbe.disabled = false;
     }
+  }
+
+  async function toggleTunnelState(idx, tunnelId) {
+    if (!currentMultiTunnels || !currentMultiTunnels[idx]) return;
+    const t = currentMultiTunnels[idx];
+    const newState = !(t.enabled !== false);
+    t.enabled = newState;
+
+    try {
+      await fetch(`/api/tunnel/${tunnelId}/toggle`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ enabled: newState })
+      });
+    } catch(e) {}
+
+    await loadMultiTunnels();
+    toast(`تانل شماره ${idx + 1} (${t.shortName}) ${newState ? 'فعال و روشن' : 'غیرفعال و خاموش'} شد.`);
+  }
+
+  async function setAllTunnelsState(enable) {
+    try {
+      await fetch('/api/tunnel/toggle-all', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ enable })
+      });
+      await loadMultiTunnels();
+      toast(enable ? 'هر ۷ تانل فعال شدند' : 'تمام تانل‌ها خاموش شدند');
+    } catch(e) {}
+  }
+
+  // Sanaei All-in-One Master API Controller
+  async function loadSanaeiInboundsTable() {
+    const host = document.getElementById('snHost').value.trim() || activeKharejIP;
+    const port = document.getElementById('snPort').value.trim() || 2053;
+    const username = document.getElementById('snUser').value.trim();
+    const password = document.getElementById('snPass').value.trim();
+    const tableBody = document.getElementById('snInboundsTableBody');
+    const badge = document.getElementById('snInboundsCounterBadge');
+    const statusBox = document.getElementById('apiStatusMessage');
+
+    if (!password) {
+      toast('لطفاً ابتدا رمز عبور پنل سنایی را وارد کنید');
+      if (statusBox) {
+        statusBox.classList.remove('hide');
+        statusBox.innerHTML = '<span style="color:var(--danger); font-weight:700;">⚠️ خطا:</span> لطفاً رمز عبور پنل سنایی را وارد نمایید.';
+      }
+      return;
+    }
+
+    tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:18px;">⏳ در حال ارتباط مستقیم با API سنایی در ${host}:${port}...</td></tr>`;
+
+    try {
+      const res = await fetch('/api/sanaei/inbounds/list', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ host, port, username, password })
+      });
+      const data = await res.json();
+      if (data.ok && Array.isArray(data.inbounds)) {
+        badge.textContent = `${data.count} اینباند ثبت‌شده در دیتابیس`;
+        badge.style.background = '#16a34a';
+
+        if (data.inbounds.length === 0) {
+          tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:18px; color:var(--ink-muted);">هیچ اینباندی در دیتابیس سنایی یافت نشد. دکمه «ساخت خودکار هر ۷ اینباند در سنایی» را بزنید.</td></tr>`;
+        } else {
+          tableBody.innerHTML = data.inbounds.map(ib => `
+            <tr>
+              <td class="mono">#${ib.id}</td>
+              <td><b>${ib.tag}</b></td>
+              <td class="mono" style="font-weight:700; color:var(--accent);">${ib.port}</td>
+              <td><span class="tunnel-proto-badge">${ib.protocol.toUpperCase()}</span></td>
+              <td class="mono" style="font-size:11.5px;">↓ ${formatBytes(ib.down)} / ↑ ${formatBytes(ib.up)}</td>
+              <td style="text-align:center;"><b>${ib.clientsCount}</b></td>
+              <td>
+                <div class="switch-wrap ${ib.enable ? 'active' : ''}" onclick="toggleSanaeiInbound(${ib.id}, ${!ib.enable})" title="کلیک برای فعال/غیرفعال کردن">
+                  <div class="switch-ui"></div>
+                  <span class="switch-lbl">${ib.enable ? 'روشن' : 'خاموش'}</span>
+                </div>
+              </td>
+              <td>
+                <button class="btn btn-outline btn-sm" style="color:var(--danger); border-color:#fca5a5; padding:4px 8px; font-size:11px;" onclick="deleteSanaeiInbound(${ib.id}, ${ib.port})">
+                  حذف
+                </button>
+              </td>
+            </tr>
+          `).join('');
+        }
+
+        // Fetch hardware stats
+        loadSanaeiHardwareStatus(host, port, username, password);
+        toast('اطلاعات زنده اینباندها و سرور از سنایی بارگذاری شد!');
+      } else {
+        tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:18px; color:var(--danger);">خطا: ${data.error || 'عدم اتصال به پنل'}</td></tr>`;
+      }
+    } catch(e) {
+      tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:18px; color:var(--danger);">خطای ارتباط: ${e.message}</td></tr>`;
+    }
+  }
+
+  async function toggleSanaeiInbound(inboundId, newEnable) {
+    const host = document.getElementById('snHost').value.trim() || activeKharejIP;
+    const port = document.getElementById('snPort').value.trim() || 2053;
+    const username = document.getElementById('snUser').value.trim();
+    const password = document.getElementById('snPass').value.trim();
+
+    try {
+      const res = await fetch('/api/sanaei/inbounds/toggle', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ host, port, username, password, inboundId, enable: newEnable })
+      });
+      const data = await res.json();
+      if (data.ok) {
+        toast(data.message);
+        loadSanaeiInboundsTable();
+      } else {
+        toast(`خطا: ${data.error}`);
+      }
+    } catch(e) {
+      toast('خطا در تغییر وضعیت اینباند');
+    }
+  }
+
+  async function deleteSanaeiInbound(inboundId, inboundPort) {
+    if (!confirm(`آیا از حذف اینباند پورت ${inboundPort} (شناسه #${inboundId}) در پنل سنایی اطمینان دارید؟`)) return;
+    const host = document.getElementById('snHost').value.trim() || activeKharejIP;
+    const port = document.getElementById('snPort').value.trim() || 2053;
+    const username = document.getElementById('snUser').value.trim();
+    const password = document.getElementById('snPass').value.trim();
+
+    try {
+      const res = await fetch('/api/sanaei/inbounds/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ host, port, username, password, inboundId })
+      });
+      const data = await res.json();
+      if (data.ok) {
+        toast(data.message);
+        loadSanaeiInboundsTable();
+      } else {
+        toast(`خطا در حذف: ${data.error}`);
+      }
+    } catch(e) {
+      toast('عدم امکان حذف اینباند');
+    }
+  }
+
+  async function resetAllSanaeiTraffics() {
+    if (!confirm('آیا از صفر کردن حجم مصرفی تمامی اینباندها در پنل سنایی اطمینان دارید؟')) return;
+    const host = document.getElementById('snHost').value.trim() || activeKharejIP;
+    const port = document.getElementById('snPort').value.trim() || 2053;
+    const username = document.getElementById('snUser').value.trim();
+    const password = document.getElementById('snPass').value.trim();
+
+    try {
+      const res = await fetch('/api/sanaei/inbounds/reset-traffic', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ host, port, username, password })
+      });
+      const data = await res.json();
+      if (data.ok) {
+        toast(data.message);
+        loadSanaeiInboundsTable();
+      } else {
+        toast(`خطا: ${data.error}`);
+      }
+    } catch(e) {
+      toast('خطا در ریست ترافیک');
+    }
+  }
+
+  async function loadSanaeiHardwareStatus(host, port, username, password) {
+    try {
+      const res = await fetch('/api/sanaei/server/status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ host, port, username, password })
+      });
+      const data = await res.json();
+      if (data.ok) {
+        const card = document.getElementById('snHardwareCard');
+        if (card) card.classList.remove('hide');
+        if (document.getElementById('snCpuVal')) {
+          document.getElementById('snCpuVal').textContent = `${Math.round(data.cpu || 0)}%`;
+        }
+        if (document.getElementById('snMemVal') && data.mem) {
+          document.getElementById('snMemVal').textContent = `${formatBytes(data.mem.current)} / ${formatBytes(data.mem.total)}`;
+        }
+        if (document.getElementById('snDiskVal') && data.disk) {
+          document.getElementById('snDiskVal').textContent = `${formatBytes(data.disk.current)} / ${formatBytes(data.disk.total)}`;
+        }
+        if (document.getElementById('snUptimeVal')) {
+          const hours = Math.floor((data.uptime || 0) / 3600);
+          document.getElementById('snUptimeVal').textContent = `${hours} ساعت روشن`;
+        }
+        if (document.getElementById('snXrayStatusPill')) {
+          const xrayOk = data.xray && data.xray.state === 'running';
+          const pill = document.getElementById('snXrayStatusPill');
+          pill.className = xrayOk ? 'status-pill status-pill-active' : 'status-pill status-pill-danger';
+          pill.textContent = xrayOk ? 'Xray: Running 🟢' : 'Xray: Stopped 🔴';
+        }
+      }
+    } catch(e) {}
   }
 
   document.getElementById('btnTestAllMatrixTunnels').addEventListener('click', async () => {
@@ -1969,7 +2502,11 @@ WantedBy=multi-user.target</pre>
           statusBox.innerHTML = `<span style="color:var(--ink-dim); font-weight:600;">ℹ️ وضعیت:</span> ${data.message}`;
         }
         renderMatrix(data.tunnels, data.subscriptionBase64);
-        toast('کانفیگ‌ها با موفقیت آماده شدند!');
+        if (data.apiLoggedIn && data.remoteCreatedCount > 0) {
+          toast(`🟢 تعداد ${data.remoteCreatedCount} اینباند در سرور سنایی ثبت شد.`);
+        } else {
+          toast('ℹ️ کانفیگ‌ها به صورت لوکال تولید شدند (هنوز به سنایی وصل نشده‌اید).');
+        }
       } else {
         statusBox.innerHTML = `<span style="color:var(--danger); font-weight:700;">🔴 خطا:</span> ${data.error || 'عدم اتصال'}`;
       }
@@ -1980,10 +2517,30 @@ WantedBy=multi-user.target</pre>
 
   document.getElementById('btnWizOfflineInbounds').addEventListener('click', async () => {
     await loadMultiTunnels();
-    toast('۵ کانفیگ و لینک سابسکریپشن به صورت آفلاین تولید شدند!');
+    toast('۷ کانفیگ و لینک سابسکریپشن به صورت آفلاین تولید شدند!');
   });
 
-  // Single Inbound Sanaei Tab
+  // Batch Enable / Disable All Tunnels
+  const btnEnableAllTunnels = document.getElementById('btnEnableAllTunnels');
+  if (btnEnableAllTunnels) {
+    btnEnableAllTunnels.addEventListener('click', () => setAllTunnelsState(true));
+  }
+  const btnDisableAllTunnels = document.getElementById('btnDisableAllTunnels');
+  if (btnDisableAllTunnels) {
+    btnDisableAllTunnels.addEventListener('click', () => setAllTunnelsState(false));
+  }
+
+  // Refresh Inbounds Table & Reset Traffic
+  const btnRefreshInboundsList = document.getElementById('btnRefreshInboundsList');
+  if (btnRefreshInboundsList) {
+    btnRefreshInboundsList.addEventListener('click', () => loadSanaeiInboundsTable());
+  }
+  const btnResetAllTraffics = document.getElementById('btnResetAllTraffics');
+  if (btnResetAllTraffics) {
+    btnResetAllTraffics.addEventListener('click', () => resetAllSanaeiTraffics());
+  }
+
+  // Batch Inbound Creation in Sanaei (All 7 Inbounds)
   document.getElementById('btnAutoCreateInbound').addEventListener('click', async () => {
     const host = document.getElementById('snHost').value.trim() || activeKharejIP;
     const port = document.getElementById('snPort').value.trim() || 2053;
@@ -1992,23 +2549,34 @@ WantedBy=multi-user.target</pre>
     const statusBox = document.getElementById('apiStatusMessage');
 
     statusBox.classList.remove('hide');
-    statusBox.innerHTML = '⏳ در حال اتصال به پنل سنایی و ثبت اینباند ۲۵۰۰...';
+    statusBox.innerHTML = '⏳ در حال اتصال به پنل سنایی سرور خارج و ثبت همزمان هر ۷ اینباند ضد فیلترینگ...';
 
     try {
-      const res = await fetch('/api/sanaei/create-inbound', {
+      const res = await fetch('/api/sanaei/create-multi-inbounds', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ host, port, username, password, inboundPort: 2500, clientPort: 9000, iranIPv4: activeIranIP })
+        body: JSON.stringify({ host, port, username, password, iranIPv4: activeIranIP })
       });
       const data = await res.json();
       if (data.ok) {
-        statusBox.innerHTML = `<span style="color:${data.liveApiSuccess ? 'var(--success)' : 'var(--ink-dim)'}; font-weight:700;">${data.liveApiSuccess ? '🟢 ثبت موفق در سرور خارج:' : 'ℹ️'}</span> ${data.liveApiMsg}`;
+        statusBox.innerHTML = `<span style="color:${data.apiLoggedIn ? 'var(--success)' : 'var(--ink-dim)'}; font-weight:700;">${data.apiLoggedIn ? '🟢 ثبت موفق در سرور خارج:' : 'ℹ️'}</span> ${data.message}`;
         document.getElementById('resultBox').classList.remove('hide');
-        document.getElementById('vlessIpv4Text').textContent = data.vlessLinkIPv4;
-        document.getElementById('subBase64Text').textContent = data.subscriptionBase64;
-        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(data.vlessLinkIPv4)}`;
-        document.getElementById('qrImg').src = qrUrl;
-        toast('اینباند و لینک تونل آماده شد!');
+        if (data.tunnels && data.tunnels.length > 0) {
+          document.getElementById('vlessIpv4Text').textContent = data.tunnels[0].vlessLink;
+          document.getElementById('subBase64Text').textContent = data.subscriptionBase64;
+          const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(data.tunnels[0].vlessLink)}`;
+          document.getElementById('qrImg').src = qrUrl;
+        }
+        renderMatrix(data.tunnels, data.subscriptionBase64);
+        if (data.apiLoggedIn && data.remoteCreatedCount > 0) {
+          toast(`🟢 تعداد ${data.remoteCreatedCount} اینباند در پنل سنایی ثبت شد.`);
+        } else {
+          toast('ℹ️ کانفیگ‌ها به صورت محلی/آفلاین تولید شدند (بدون اتصال به سرور سنایی).');
+        }
+        // Refresh live inbounds list from Sanaei API
+        if (data.apiLoggedIn) {
+          setTimeout(() => loadSanaeiInboundsTable(), 800);
+        }
       } else {
         statusBox.innerHTML = `<span style="color:var(--danger); font-weight:700;">🔴 خطا:</span> ${data.error}`;
       }
@@ -2017,33 +2585,39 @@ WantedBy=multi-user.target</pre>
     }
   });
 
-  document.getElementById('btnQuickOffline').addEventListener('click', async () => {
-    try {
-      const res = await fetch(`/api/sanaei/quick-generate?iranIP=${encodeURIComponent(activeIranIP)}&iranIPv6=${encodeURIComponent(activeIranIPv6)}`);
-      const data = await res.json();
-      if (data.ok) {
-        document.getElementById('resultBox').classList.remove('hide');
-        document.getElementById('vlessIpv4Text').textContent = data.vlessLinkIPv4;
-        document.getElementById('subBase64Text').textContent = data.subscriptionBase64;
-        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(data.vlessLinkIPv4)}`;
-        document.getElementById('qrImg').src = qrUrl;
-        toast('کانفیگ و لینک تولید شد!');
-      }
-    } catch(e) {}
-  });
+  const btnQuickOffline = document.getElementById('btnQuickOffline');
+  if (btnQuickOffline) {
+    btnQuickOffline.addEventListener('click', async () => {
+      try {
+        const res = await fetch(`/api/sanaei/quick-generate?iranIP=${encodeURIComponent(activeIranIP)}&iranIPv6=${encodeURIComponent(activeIranIPv6)}`);
+        const data = await res.json();
+        if (data.ok) {
+          document.getElementById('resultBox').classList.remove('hide');
+          document.getElementById('vlessIpv4Text').textContent = data.vlessLinkIPv4;
+          document.getElementById('subBase64Text').textContent = data.subscriptionBase64;
+          const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(data.vlessLinkIPv4)}`;
+          document.getElementById('qrImg').src = qrUrl;
+          toast('کانفیگ و لینک تولید شد!');
+        }
+      } catch(e) {}
+    });
+  }
 
   // Copy Customer Telegram/WhatsApp Message
   function copyCustomerMessage() {
     const sub = document.getElementById('wizSubText').textContent.trim();
-    const msg = `🛡️ سرویس اینترنت آزاد و ضد فیلترینگ اختصاصی شما آماده است:
+    const msg = `🛡️ سرویس اینترنت آزاد و ضد فیلترینگ ۷-پروتکله اختصاصی شما آماده است:
 
 📱 راهنمای اتصال سریع:
-۱) نرم‌افزار v2rayNG (برای اندروید) یا Streisand / FoXray / V2Box (برای آیفون) را باز کنید.
+۱) نرم‌افزار v2rayNG (برای اندروید) یا Streisand / FoXray / V2Box (برای آیفون) یا Nekoray / V2RayN (برای ویندوز) را باز کنید.
 ۲) لینک سابسکریپشن زیر را کپی کرده و در منوی Subscription Group برنامه اضافه نمایید:
 
 ${sub}
 
-⚡ این لینک شامل ۵ پروتکل همزمان ضد DPI است تا در زمان قطعی سراسری اینترنت، کلاینت به صورت اتوماتیک سریع‌ترین کانال را انتخاب کند.`;
+⚡ مشخصات کانال‌ها:
+• کانال‌های ۱ تا ۵ (پورت‌های ۹۰۰۰ تا ۹۰۰۴): پروتکل‌های شتاب‌یافته TLS ،WebSocket و gRPC ضد DPI برای حالت عادی و نیمه‌ملی.
+• کانال ۶ (پورت ۹۰۰۵ - تانل معکوس): ویژه شرایط قطعی کامل اینترنت بین‌الملل (اینترنت ملی) و سرورهای بدون اینترنت خارجی.
+• کانال ۷ (پورت ۹۰۰۶ - بای‌پس لیست سفید): ویژه سرورهای اکسس‌شده (Access-IP) با پوشش SNI دامنه‌های مجاز ایرانی.`;
 
     navigator.clipboard.writeText(msg).then(() => {
       toast('پیام مشتری با موفقیت در کلیپ‌بورد کپی شد!');
