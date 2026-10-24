@@ -10,13 +10,44 @@
 
 ---
 
-> ## 🚧 نسخه‌ی بتا
->
-> **این یک نسخه‌ی بتا از آپدیتِ جدید است.**
-> نسخه‌ی نهایی و پایدار **تا ۲ روزِ دیگر** منتشر خواهد شد — با قابلیت‌های بیشتر، اتوماسیونِ کاملِ CDN و رابطِ کاربریِ تکمیل‌شده.
-> فعلاً می‌توانید همین نسخه را تست کنید و بازخورد بدهید. 🙏
+## ⚡ نصب فوری دو سرور (سرور خارج و سرور ایران) با یک کلیک
+
+کانفیگ‌شده به‌صورت مستقیم برای سرورهای خارج و ایران:
+- **سرور خارج (Foreign Server):** `13.140.81.175`
+- **سرور ایران (Iran Relay Server):** `188.121.101.206` (IPv6: `2a07:3903:0:2::21c`)
 
 ---
+
+### ۱. دستور اجرای خودکار روی سرور خارج (`13.140.81.175`):
+در ترمینال SSH سرور خارج با دسترسی **`root`** اجرا کنید:
+```bash
+curl -fsSL https://raw.githubusercontent.com/dnjebeuifedihwdih/T2HASH-CORE/main/install-kharej.sh | sudo bash
+```
+یا اجرای اسکریپت چندمنظوره:
+```bash
+curl -fsSL https://raw.githubusercontent.com/dnjebeuifedihwdih/T2HASH-CORE/main/install-dual.sh | sudo bash
+```
+
+---
+
+### ۲. دستور اجرای خودکار روی سرور ایران (`188.121.101.206`):
+در ترمینال SSH سرور ایران با دسترسی **`root`** اجرا کنید:
+```bash
+curl -fsSL https://raw.githubusercontent.com/dnjebeuifedihwdih/T2HASH-CORE/main/install-iran.sh | sudo bash
+```
+
+---
+
+### ۳. تنظیمات کانفیگ کاربر در پنل ۳x-ui و نرم‌افزار کلاینت:
+- **اینباند در 3x-ui (روی سرور خارج):**
+  - Protocol: `VLESS` | Port: `2500` | Security: `none` | Network: `tcp`
+- **کانفیگ نهایی برای کاربر در v2rayNG / Sing-box:**
+  - Address: `188.121.101.206`
+  - Port: `9000`
+  - Protocol: `VLESS` | Security: `none`
+
+---
+
 
 <div align="right">
 

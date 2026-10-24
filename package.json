@@ -1,0 +1,18 @@
+{
+  "name": "t2tunnel-console",
+  "version": "2.4.0",
+  "description": "T2HASH Tunnel Manager and Dual-Server Deployment Console",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "build": "echo 'Build successful'",
+    "lint": "node --check server.js"
+  },
+  "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "express": "^4.21.2"
+  }
+}

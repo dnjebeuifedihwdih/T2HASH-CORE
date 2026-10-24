@@ -1,0 +1,8 @@
+{
+  "name": "mh.tunnel",
+  "description": "سامانه جامع تانل و پروکسی ضد فیلترینگ با پشتیبانی از هر جفت آی‌پی دلخواه، ماتریس ۵ تونل همزمان، اتوماسیون پنل سنایی و راهنمای گام‌به‌گام مشتری",
+  "permissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
