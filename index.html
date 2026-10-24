@@ -1091,10 +1091,21 @@
             <div>⏱️ اعتبار: <b id="ucSummaryDays">30 روز</b></div>
           </div>
 
+          <div class="vless-box-white" style="border:2px solid #2563eb; background:#eff6ff;">
+            <div class="vless-label-white">
+              <span style="color:#1e3a8a; font-weight:800;">🔗 لینک سابسکریپشن زنده و قابل بروزرسانی (Live HTTP Subscription URL):</span>
+              <button class="btn btn-accent btn-sm" onclick="copyText('ucLiveSubUrlText', 'لینک سابسکریپشن زنده کپی شد!')">📋 کپی لینک زنده</button>
+            </div>
+            <div class="vless-uri-white mono" id="ucLiveSubUrlText" style="color:#1e40af; font-weight:700;">http://iran.limogame4.site:3000/sub/user_ali</div>
+            <div style="font-size:11px; color:#3b82f6; margin-top:4px;">
+              💡 این آدرس را مستقیم در منوی Subscription Group برنامه‌های v2rayNG / V2Box / Nekoray وارد کنید تا با دکمه Update Subscriptions، تمام کانال‌های زنده بارگذاری شوند.
+            </div>
+          </div>
+
           <div class="vless-box-white">
             <div class="vless-label-white">
-              <span>🌐 لینک سابسکریپشن (Subscription Group Base64):</span>
-              <button class="btn btn-outline btn-sm" onclick="copyText('ucSubBase64Text', 'لینک سابسکریپشن کاربر کپی شد!')">📋 کپی لینک سابسکریپشن</button>
+              <span>🌐 کد گروهی سابسکریپشن (Base64 Subscription Group):</span>
+              <button class="btn btn-outline btn-sm" onclick="copyText('ucSubBase64Text', 'کد سابسکریپشن کپی شد!')">📋 کپی کد سابسکریپشن</button>
             </div>
             <div class="vless-uri-white" id="ucSubBase64Text">...</div>
           </div>
@@ -3087,6 +3098,9 @@ ${sub}
           document.getElementById('ucSummaryGB').textContent = `${data.totalGB} GB`;
           document.getElementById('ucSummaryDays').textContent = `${data.expiryDays} روز`;
           document.getElementById('ucSubBase64Text').textContent = data.subscriptionBase64;
+          if (document.getElementById('ucLiveSubUrlText')) {
+            document.getElementById('ucLiveSubUrlText').textContent = data.liveSubUrl || `http://${data.iranHost}:3000/sub/${data.username}`;
+          }
 
           // Render 7 individual VLESS configs
           const configsContainer = document.getElementById('ucConfigsList');

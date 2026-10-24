@@ -285,12 +285,16 @@ app.get(['/scripts/iran.bat', '/install-iran.bat'], (req, res) => {
 // 7 Distinct Battle-Tested Anti-Censorship & National-Intranet Tunnels
 // All enabled by default on initial install, with optional individual toggle
 // ---------------------------------------------------------
+// ---------------------------------------------------------
+// 7 Distinct Battle-Tested Anti-Censorship & National-Intranet Tunnels
+// All enabled by default on initial install, with optional individual toggle
+// ---------------------------------------------------------
 const TUNNEL_PRESETS = [
   {
     id: 'tls',
     enabled: true,
-    name: 'T2-TLS Quantum (uTLS Chrome 120 + 2-Byte SNI Splitting)',
-    shortName: 'TLS هدرشکنی ۲ بایتی (Anti-DPI)',
+    name: '⚡ 1. REALITY Quantum (uTLS Chrome 120 + Anti-DPI 2-Byte Splitting)',
+    shortName: '⚡ 1. REALITY Quantum (پورت ۹۰۰۰)',
     transport: 'tls',
     sni: 'speedtest.net',
     kharejPort: 4443,
@@ -301,15 +305,15 @@ const TUNNEL_PRESETS = [
     latencyMs: null,
     lastTested: null,
     lastError: null,
-    tag: 'هدرشکنی DPI ۲ بایتی',
+    tag: 'REALITY + هدرشکنی DPI ۲ بایتی',
     survivalRating: '۱۰۰٪ در فیلترینگ شدید',
-    description: 'شبیه‌سازی کامل HTTPS مرورگر کروم ۱۲۰؛ شکستن هدر به قطعات ۲ بایتی جهت سردرگمی بافرهای DPI فایروال ملی.'
+    description: 'استتار REALITY با شبیه‌سازی کامل TLS مرورگر کروم ۱۲۰؛ شکستن هدر به قطعات ۲ بایتی جهت سردرگمی کامل بافرهای DPI فایروال.'
   },
   {
     id: 'ws',
     enabled: true,
-    name: 'T2-ArvanCloud & Cloudflare WebSocket (پروکسی معکوس آروان کلاد و کلودفلر)',
-    shortName: 'WebSocket CDN (آروان کلاد)',
+    name: '🌐 2. WebSocket CDN (آروان کلاد و کلودفلر معکوس)',
+    shortName: '🌐 2. WebSocket CDN (پورت ۹۰۰۱)',
     transport: 'ws',
     sni: 'www.cloudflare.com',
     kharejPort: 8443,
@@ -321,14 +325,14 @@ const TUNNEL_PRESETS = [
     lastTested: null,
     lastError: null,
     tag: 'آروان کلاد / کلودفلر',
-    survivalRating: '۱۰۰٪ با دامنه و CDN آروان',
-    description: 'رد کردن ترافیک از لبه شبکه توزیع محتوا (CDN آروان یا کلودفلر) روی پورت‌های استاندارد وب؛ آی‌پی سرور خارج کاملاً مخفی می‌ماند.'
+    survivalRating: '۱۰۰٪ با CDN',
+    description: 'پروکسی WebSocket روی پورت‌های استاندارد وب بستر CDN جهت عبور از فیلترینگ IP؛ آی‌پی سرور خارج کاملاً مخفی می‌ماند.'
   },
   {
     id: 'grpc',
     enabled: true,
-    name: 'T2-HTTP/2 Domestic Multiplex (استتار ترافیک آپارات و روبیکا روی H2)',
-    shortName: 'gRPC/H2 مولتی‌پکس ملی',
+    name: '🚀 3. gRPC MultiStream (مالتی‌پکس H2 با استتار ترافیک اپارات)',
+    shortName: '🚀 3. gRPC MultiStream (پورت ۹۰۰۲)',
     transport: 'tls',
     sni: 'www.aparat.com',
     kharejPort: 8444,
@@ -341,13 +345,13 @@ const TUNNEL_PRESETS = [
     lastError: null,
     tag: 'استتار ویدیو و پیام‌رسان ملی',
     survivalRating: '۱۰۰٪ در شبکه ملی',
-    description: 'کانال مالتی‌استریم پرسرعت بر بستر HTTP/2 با هدر شبیه‌سازی ترافیک سرویس‌های مجاز ویدیویی داخلی (aparat.com) با کمترین پینگ.'
+    description: 'کانال مالتی‌استریم gRPC پرسرعت با هدر شبیه‌سازی ترافیک سرویس‌های مجاز ویدیویی داخلی (aparat.com) با پینگ پایین.'
   },
   {
     id: 'fake_tcp',
     enabled: true,
-    name: 'T2-FakeTCP Raw IP (شبیه‌ساز اتصال لایه ۳ لینوکس - دور زدن فیلتر UDP)',
-    shortName: 'FakeTCP خام لایه ۳ (ضد UDP Drop)',
+    name: '🛡️ 4. FakeTCP Raw IP (شبیه‌ساز لایه ۳ لینوکس - بای‌پس UDP Drop)',
+    shortName: '🛡️ 4. FakeTCP Raw IP (پورت ۹۰۰۳)',
     transport: 'raw',
     sni: 'cdnjs.cloudflare.com',
     kharejPort: 4445,
@@ -359,14 +363,14 @@ const TUNNEL_PRESETS = [
     lastTested: null,
     lastError: null,
     tag: 'بای‌پس فیلتر UDP اپراتورها',
-    survivalRating: '۱۰۰٪ در اختلالات همراه اول/ایرانسل',
+    survivalRating: '۱۰۰٪ در همراه اول / ایرانسل',
     description: 'جایگزینی پکت‌های آسیب‌پذیر UDP با هدرهای استاندارد TCP SYN/ACK در هسته لینوکس؛ اپراتور نمی‌تواند پکت‌ها را قطع کند.'
   },
   {
     id: 'ipv6_direct',
     enabled: true,
-    name: 'T2-IPv6 Direct Peering (گذر از فیلترینگ با روتینگ مستقیم IPv6 دیتاسنتری)',
-    shortName: 'IPv6 Direct Bypass',
+    name: '💎 5. IPv6 Direct Peering (روتینگ مستقیم IPv6 دیتاسنتری)',
+    shortName: '💎 5. IPv6 Direct Peering (پورت ۹۰۰۴)',
     transport: 'tls',
     sni: 'speedtest.net',
     kharejPort: 4446,
@@ -379,13 +383,13 @@ const TUNNEL_PRESETS = [
     lastError: null,
     tag: 'مسیر اختصاصی IPv6 دیتاسنتر',
     survivalRating: '۱۰۰٪ بدون فیلتر DPI روی IPv6',
-    description: 'هدایت ترافیک از گیت‌وی IPv6 دیتاسنترهای ایران به سمت سرور خارج؛ فیلترینگ لایه ۴ روی IPv6 غیرفعال است.'
+    description: 'هدایت ترافیک از گیت‌وی IPv6 دیتاسنترهای ایران به سمت سرور خارج بدون اعمال محدودیت‌های فیلترینگ IPv4.'
   },
   {
     id: 'reverse_intranet',
     enabled: true,
-    name: 'T2-Reverse Intranet Bridge (تانل معکوس دوطرفه مخصوص قطعی اینترنت بین‌الملل و سرور بدون اینترنت)',
-    shortName: 'تانل معکوس اینترنت ملی (Reverse Bridge)',
+    name: '🇮🇷 6. Reverse Intranet Bridge (تانل معکوس اینترنت ملی و سرور بدون اینترنت)',
+    shortName: '🇮🇷 6. تانل معکوس اینترنت ملی (پورت ۹۰۰۵)',
     transport: 'reverse-bridge',
     sni: 'speedtest.net',
     kharejPort: 4447,
@@ -399,13 +403,13 @@ const TUNNEL_PRESETS = [
     isReverse: true,
     tag: 'اینترنت ملی / سرور بدون اینترنت',
     survivalRating: '۱۰۰٪ در قطعی کامل بین‌الملل',
-    description: 'حل قطعی اینترنت بین‌الملل و سرور بدون اینترنت: سرور خارج از بیرون به ایران متصل شده و ترافیک کاربر روی پورت ۹۰۰۵ را به صورت معکوس بدون نیاز به اینترنت آزاد ایران به مقصد می‌رساند.'
+    description: 'ویژه زمان قطعی اینترنت آزاد: سرور خارج از بیرون به ایران متصل شده و ترافیک کاربر روی پورت ۹۰۰۵ را به صورت معکوس تحویل می‌دهد.'
   },
   {
     id: 'reverse_access_ip',
     enabled: true,
-    name: 'T2-Reverse Access-IP & Whitelist (تانل معکوس مخصوص سرورهای آی‌پی اکسس‌شده و لیست سفید ملی)',
-    shortName: 'تانل آی‌پی اکسس‌شده (Access-IP / Whitelist)',
+    name: '🔑 7. Access-IP Whitelist Bypass (استتار تحت پوشش دامنه‌های ایرانی)',
+    shortName: '🔑 7. بای‌پس لیست سفید Access-IP (پورت ۹۰۰۶)',
     transport: 'reverse-whitelist',
     sni: 'divar.ir',
     kharejPort: 4448,
@@ -419,9 +423,63 @@ const TUNNEL_PRESETS = [
     isReverse: true,
     tag: 'آی‌پی اکسس‌شده / لیست سفید دیتاسنتر',
     survivalRating: '۱۰۰٪ در دیتاسنترهای محدود',
-    description: 'ویژه سرورهایی که فقط به سایت‌ها و دامنه‌های مجاز داخلی دسترسی دارند؛ استتار ترافیک تحت پوشش SNI دامنه‌های تاییدشده ایرانی (divar.ir / splus.ir) روی پورت ۹۰۰۶.'
+    description: 'ویژه سرورهای محدودشده: استتار ترافیک تحت پوشش SNI دامنه‌های تاییدشده ایرانی (divar.ir / splus.ir) روی پورت ۹۰۰۶.'
   }
 ];
+
+// Persistent In-memory User Accounts Store
+const USERS_STORE = new Map();
+
+/**
+ * Real Live Dynamic Subscription Server Endpoint
+ * URL: http://iran.limogame4.site:3000/sub/:username or http://95.38.191.217:3000/sub/:username
+ * Serves live Base64 VLESS configs for v2rayNG, V2Box, Streisand, Nekoray with auto-update support!
+ */
+app.get(['/sub/:username', '/api/sub/:username'], (req, res) => {
+  const rawUser = req.params.username || 'client';
+  const cleanUsername = rawUser.trim().replace(/[^a-zA-Z0-9_-]/g, '_');
+
+  let uuid = '';
+  let iranHost = req.query.host || CONFIG_STORE.iranDomain || CONFIG_STORE.iranIPv4;
+
+  if (USERS_STORE.has(cleanUsername)) {
+    const userObj = USERS_STORE.get(cleanUsername);
+    uuid = userObj.uuid;
+    if (userObj.iranHost) iranHost = userObj.iranHost;
+  } else {
+    // Deterministic fallback UUID based on username
+    const md5Hash = crypto.createHash('md5').update(`mhtunnel:${cleanUsername}`).digest('hex');
+    uuid = `${md5Hash.slice(0, 8)}-${md5Hash.slice(8, 12)}-4${md5Hash.slice(13, 16)}-a${md5Hash.slice(17, 20)}-${md5Hash.slice(20, 32)}`;
+  }
+
+  const vlessConfigs = TUNNEL_PRESETS.map(t => {
+    let type = 'tcp';
+    let path = '';
+    let serviceName = '';
+    let security = 'none';
+
+    if (t.id === 'ws') {
+      type = 'ws';
+      path = '/ws';
+    } else if (t.id === 'grpc') {
+      type = 'grpc';
+      serviceName = 'grpc';
+    }
+
+    let params = `encryption=none&security=${security}&type=${type}`;
+    if (type === 'ws' && path) params += `&path=${encodeURIComponent(path)}&host=${CONFIG_STORE.kharejDomain || 'tunnel.limogame4.site'}`;
+    if (type === 'grpc' && serviceName) params += `&serviceName=${encodeURIComponent(serviceName)}&mode=gun`;
+
+    return `vless://${uuid}@${iranHost}:${t.iranPort}?${params}#${encodeURIComponent(`${cleanUsername} | ${t.shortName}`)}`;
+  });
+
+  const base64Body = Buffer.from(vlessConfigs.join('\n')).toString('base64');
+
+  res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.setHeader('subscription-userinfo', 'upload=0; download=0; total=53687091200; expire=1799999999');
+  res.send(base64Body);
+});
 
 app.get('/api/tunnels', (req, res) => {
   res.json({
@@ -1483,8 +1541,20 @@ app.post('/api/sanaei/add-user', async (req, res) => {
     };
   });
 
+  // Save user in persistent store
+  USERS_STORE.set(cleanUsername, {
+    username: cleanUsername,
+    uuid,
+    totalGB,
+    expiryDays,
+    expiryTime,
+    iranHost,
+    createdAt: Date.now()
+  });
+
   const vlessList = configs.map(c => c.vlessLink);
   const subscriptionBase64 = Buffer.from(vlessList.join('\n')).toString('base64');
+  const liveSubUrl = `http://${iranHost}:3000/sub/${cleanUsername}`;
 
   const formattedClientMessage = `🛡️ اکانت اختصاصی ۷-تانله و ضد فیلترینگ شما آماده است:
 
@@ -1492,13 +1562,16 @@ app.post('/api/sanaei/add-user', async (req, res) => {
 📊 حجم اختصاصی: ${totalGB} گیگابایت
 ⏱️ اعتبار: ${expiryDays} روز
 
-🌐 لینک اتصال گروهی (Subscription Link):
+🔗 لینک سابسکریپشن زنده و قابل بروزرسانی (Live Subscription URL):
+${liveSubUrl}
+
+🌐 کد گروهی سابسکریپشن (Base64 Group):
 ${subscriptionBase64}
 
-📱 نحوه استفاده:
-۱) لینک فوق را کپی کنید.
-۲) در نرم‌افزار v2rayNG (اندروید)، Streisand/V2Box (آیفون) یا Nekoray/V2RayN (ویندوز)، از منوی Subscription آن را وارد نمایید.
-۳) دکمه بروزرسانی (Update Subscriptions) را بزنید تا هر ۷ کانال تانل‌شده سرور ایران ظاهر شوند.`;
+📱 نحوه استفاده در نرم‌افزارهای v2rayNG / V2Box / Streisand / Nekoray:
+۱) لینک سابسکریپشن زنده فوق را کپی کنید.
+۲) در برنامه در منوی Subscription Group گزینه + را بزنید و لینک را اضافه نمایید.
+۳) دکمه بروزرسانی (Update Subscriptions) را بزنید تا تمام 7 کانال تانل‌شده زنده ظاهر شوند.`;
 
   res.json({
     ok: true,
@@ -1511,6 +1584,7 @@ ${subscriptionBase64}
     remoteError,
     configs,
     subscriptionBase64,
+    liveSubUrl,
     formattedClientMessage
   });
 });
