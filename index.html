@@ -844,6 +844,12 @@
         <span class="nav-badge">شروع سریع</span>
       </button>
 
+      <button class="nav-btn" data-tab="user-creator">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+        ساخت اکانت کاربر (User Creator)
+        <span class="nav-badge" style="background:#2563eb; color:#fff;">۵/۷ تانله</span>
+      </button>
+
       <button class="nav-btn" data-tab="multi-tunnels">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
         ماتریس ۷ تونل همزمان
@@ -982,6 +988,141 @@
         </div>
       </div>
     </div>
+
+    <!-- ====================================================================
+         VIEW: MULTI-TUNNEL USER CREATOR (ساخت کاربر ۵/۷ تانله در سنایی)
+         ==================================================================== -->
+    <section class="view-pane" id="pane-user-creator">
+      <div class="page-title-box">
+        <div class="page-kicker">SANAEI MULTI-TUNNEL USER CREATOR & CONFIG GENERATOR</div>
+        <h1 class="page-heading">ساخت اکانت کاربر و تحویل کانفیگ ۵/۷ تانل شده</h1>
+        <p class="page-lead">با وارد کردن نام کاربر و مشخصات، کاربر به طور همزمان در پنل سنایی (سرور خارج) ثبت شده و لینک‌های تانل‌شده سرور ایران به همراه کد سابسکریپشن و پیام آماده تحویل داده می‌شود.</p>
+      </div>
+
+      <!-- Quick Info Bar with User's Specific Domains & IPs -->
+      <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: var(--r); padding: 14px 18px; margin-bottom: 20px; font-size: 13px; color: #1e3a8a; line-height: 1.7;">
+        <b>🌐 سرورهای فعال کنونی:</b><br>
+        • سرور خارج: <span class="mono" style="font-weight:700;">13.140.87.14</span> (دامنه: <span class="mono" style="font-weight:700;">tunnel.limogame4.site</span> | پورت سنایی: <span class="mono" style="font-weight:700;">53008</span>)<br>
+        • سرور ایران (مقصد اتصالات): <span class="mono" style="font-weight:700;">95.38.191.217</span> (دامنه: <span class="mono" style="font-weight:700;">iran.limogame4.site</span>)
+      </div>
+
+      <div class="card-clean">
+        <div class="card-head">
+          <div class="card-title-text"><span class="bullet"></span>فرم ساخت اکانت جدید کاربر در سنایی</div>
+          <span class="status-pill status-pill-active">API Token Connected</span>
+        </div>
+        <div class="card-body">
+          <div class="grid-2" style="margin-bottom:14px;">
+            <div class="field-wrap">
+              <label class="field-lbl">نام کاربری / شناسه اکانت (Remark/Email)</label>
+              <input class="inp-clean" id="ucUsername" value="user_ali" placeholder="مثال: user_ali یا reza_m">
+              <div class="field-hint">نام کاربری جهت ثبت در دیتابیس سنایی و برچسب کانفیگ‌ها</div>
+            </div>
+
+            <div class="field-wrap">
+              <label class="field-lbl">آدرس اتصال نهایی (دامنه یا آی‌پی سرور ایران)</label>
+              <select class="inp-clean" id="ucIranHost" style="font-family:var(--mono);">
+                <option value="iran.limogame4.site" selected>iran.limogame4.site (دامنه سرور ایران)</option>
+                <option value="95.38.191.217">95.38.191.217 (آی‌پی مستقیم سرور ایران)</option>
+                <option value="tunnel.limogame4.site">tunnel.limogame4.site (مستقیم سرور خارج)</option>
+              </select>
+              <div class="field-hint">کانفیگ‌های VLESS کاربر به این آدرس متصل خواهند شد</div>
+            </div>
+          </div>
+
+          <div class="grid-2" style="margin-bottom:16px;">
+            <div class="field-wrap">
+              <label class="field-lbl">حجم ترافیک اختصاصی (گیگابایت - GB)</label>
+              <input class="inp-clean" id="ucTotalGB" type="number" value="50" placeholder="مثلاً 50">
+            </div>
+
+            <div class="field-wrap">
+              <label class="field-lbl">مدت اعتبار اکانت (روز)</label>
+              <input class="inp-clean" id="ucExpiryDays" type="number" value="30" placeholder="مثلاً 30">
+            </div>
+          </div>
+
+          <!-- Advanced Sanaei Parameters Collapsible -->
+          <div style="background:var(--bg); border:1px solid var(--border); border-radius:6px; padding:12px 16px; margin-bottom:16px;">
+            <div style="font-size:12.5px; font-weight:800; color:var(--ink); margin-bottom:8px;">⚙️ تنظیمات اتصال به API سنایی:</div>
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:10px;">
+              <div>
+                <label class="field-lbl" style="font-size:11px;">آی‌پی خارج:</label>
+                <input class="inp-clean" id="ucSnHost" value="13.140.87.14" style="font-size:12px; padding:6px 10px;">
+              </div>
+              <div>
+                <label class="field-lbl" style="font-size:11px;">پورت سنایی:</label>
+                <input class="inp-clean" id="ucSnPort" value="53008" style="font-size:12px; padding:6px 10px;">
+              </div>
+              <div>
+                <label class="field-lbl" style="font-size:11px;">مسیر پایه (BasePath):</label>
+                <input class="inp-clean" id="ucSnBasePath" value="WTy9cJKmxOphyIW78A" style="font-size:12px; padding:6px 10px;">
+              </div>
+              <div>
+                <label class="field-lbl" style="font-size:11px;">توکن API سنایی:</label>
+                <input class="inp-clean" id="ucSnApiToken" value="PS9j4s3FcPs5Jd4dvotYep7KVHdRwBclabkPRCqEMZjBQQxs" style="font-size:12px; padding:6px 10px;">
+              </div>
+            </div>
+          </div>
+
+          <button class="btn btn-accent" id="btnCreateUserAccount" style="width:100%; height:46px; font-size:14px;">
+            ✨ ساخت اکانت ۵/۷ تانله در سنایی و تحویل کانفیگ تانل‌شده
+          </button>
+
+          <div id="ucStatusMsg" class="hide" style="margin-top:14px; padding:12px; background:var(--bg); border:1px solid var(--border); border-radius:6px; font-size:12.5px; line-height:1.7;"></div>
+        </div>
+      </div>
+
+      <!-- User Creation Output Result Card -->
+      <div class="card-clean hide" id="ucResultCard">
+        <div class="card-head">
+          <div class="card-title-text">
+            <span class="bullet"></span>
+            نتیجه ساخت اکانت کاربر: <span id="ucResultUserTitle" class="mono" style="color:var(--accent);">user_ali</span>
+          </div>
+          <span class="status-pill status-pill-active" id="ucResultBadge">ثبت شد</span>
+        </div>
+        <div class="card-body">
+          <!-- Client Details Summary -->
+          <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:6px; padding:12px 16px; margin-bottom:14px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; font-size:12.5px;">
+            <div>👤 کاربر: <b class="mono" id="ucSummaryUser">user_ali</b></div>
+            <div>🔑 UUID اختصاصی: <b class="mono" id="ucSummaryUUID" style="font-size:11px;">-</b></div>
+            <div>📊 حجم: <b id="ucSummaryGB">50 GB</b></div>
+            <div>⏱️ اعتبار: <b id="ucSummaryDays">30 روز</b></div>
+          </div>
+
+          <div class="vless-box-white">
+            <div class="vless-label-white">
+              <span>🌐 لینک سابسکریپشن (Subscription Group Base64):</span>
+              <button class="btn btn-outline btn-sm" onclick="copyText('ucSubBase64Text', 'لینک سابسکریپشن کاربر کپی شد!')">📋 کپی لینک سابسکریپشن</button>
+            </div>
+            <div class="vless-uri-white" id="ucSubBase64Text">...</div>
+          </div>
+
+          <div style="margin-top:14px; margin-bottom:10px; font-weight:800; font-size:13.5px; color:var(--ink);">
+            📱 لینک‌های مستقیم تک‌تک ۷ تانل (متصل به سرور ایران):
+          </div>
+          <div id="ucConfigsList" style="display:flex; flex-direction:column; gap:8px;">
+            <!-- Individual VLESS URIs injected here -->
+          </div>
+
+          <div class="qr-container-white" style="margin-top:16px;">
+            <div class="qr-box-white">
+              <img id="ucQrImg" src="" alt="QR Code">
+            </div>
+            <div style="flex:1;">
+              <h4 style="font-size:14px; font-weight:800; color:var(--ink); margin-bottom:4px;">اسکن سریع بارکد یا ارسال پیام آماده</h4>
+              <p style="font-size:12px; color:var(--ink-muted); margin-bottom:10px;">
+                بارکد مربوط به اولین کانال تانل‌شده می‌باشد. برای ارسال آسان به کاربر در تلگرام، روی دکمه زیر کلیک کنید:
+              </p>
+              <button class="btn btn-solid btn-sm" id="btnCopyClientMessage" style="background:#2563eb; border-color:#2563eb;">
+                💬 کپی پیام آماده تلگرام/واتساپ برای مشتری
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <!-- ====================================================================
          VIEW 0: CUSTOMER SETUP WIZARD (راهنمای گام‌به‌گام هوشمند مشتری)
@@ -2888,6 +3029,111 @@ ${sub}
   const sidebarUpdatePanelBtn = document.getElementById('sidebarUpdatePanelBtn');
   if (sidebarUpdatePanelBtn) {
     sidebarUpdatePanelBtn.addEventListener('click', updatePanelNow);
+  }
+
+  // Sanaei User Account Creator Handler
+  let lastUserClientMessage = '';
+
+  const btnCreateUserAccount = document.getElementById('btnCreateUserAccount');
+  if (btnCreateUserAccount) {
+    btnCreateUserAccount.addEventListener('click', async () => {
+      const username = document.getElementById('ucUsername').value.trim() || 'user_ali';
+      const iranHost = document.getElementById('ucIranHost').value.trim() || 'iran.limogame4.site';
+      const totalGB = document.getElementById('ucTotalGB').value.trim() || '50';
+      const expiryDays = document.getElementById('ucExpiryDays').value.trim() || '30';
+
+      const host = document.getElementById('ucSnHost').value.trim() || '13.140.87.14';
+      const port = document.getElementById('ucSnPort').value.trim() || '53008';
+      const basePath = document.getElementById('ucSnBasePath').value.trim() || 'WTy9cJKmxOphyIW78A';
+      const apiToken = document.getElementById('ucSnApiToken').value.trim() || 'PS9j4s3FcPs5Jd4dvotYep7KVHdRwBclabkPRCqEMZjBQQxs';
+
+      const statusMsg = document.getElementById('ucStatusMsg');
+      const resultCard = document.getElementById('ucResultCard');
+
+      if (statusMsg) {
+        statusMsg.classList.remove('hide');
+        statusMsg.innerHTML = `⏳ در حال افزودن کاربر <b>${username}</b> به اینباندهای سنایی و ایجاد کانفیگ‌های تانل‌شده روی <b>${iranHost}</b>...`;
+      }
+
+      try {
+        const res = await fetch('/api/sanaei/add-user', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username,
+            totalGB,
+            expiryDays,
+            iranHost,
+            host,
+            port,
+            basePath,
+            apiToken
+          })
+        });
+        const data = await res.json();
+
+        if (data.ok) {
+          lastUserClientMessage = data.formattedClientMessage;
+
+          if (statusMsg) {
+            statusMsg.innerHTML = `<span style="color:var(--success); font-weight:800;">🟢 اکانت با موفقیت ساخته شد:</span> کاربر ${data.username} با حجم ${data.totalGB}GB و اعتبار ${data.expiryDays} روزه در تعداد ${data.addedToRemoteCount} اینباند سنایی ثبت گردید.`;
+          }
+
+          if (resultCard) resultCard.classList.remove('hide');
+
+          document.getElementById('ucResultUserTitle').textContent = data.username;
+          document.getElementById('ucSummaryUser').textContent = data.username;
+          document.getElementById('ucSummaryUUID').textContent = data.uuid;
+          document.getElementById('ucSummaryGB').textContent = `${data.totalGB} GB`;
+          document.getElementById('ucSummaryDays').textContent = `${data.expiryDays} روز`;
+          document.getElementById('ucSubBase64Text').textContent = data.subscriptionBase64;
+
+          // Render 7 individual VLESS configs
+          const configsContainer = document.getElementById('ucConfigsList');
+          if (configsContainer && Array.isArray(data.configs)) {
+            configsContainer.innerHTML = data.configs.map((c, idx) => `
+              <div style="background:var(--bg); border:1px solid var(--border); padding:10px 12px; border-radius:6px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; font-size:12px; font-weight:800;">
+                  <span>کانال تانل شماره ${idx + 1}: ${c.shortName} (پورت ${c.iranPort})</span>
+                  <button class="btn btn-outline btn-sm" style="padding:2px 8px; font-size:11px;" onclick="navigator.clipboard.writeText('${c.vlessLink}'); toast('لینک کپی شد!');">📋 کپی لینک</button>
+                </div>
+                <div class="mono" style="font-size:11px; word-break:break-all; user-select:all; color:var(--ink-dim);">${c.vlessLink}</div>
+              </div>
+            `).join('');
+          }
+
+          // QR Code for the 1st config
+          if (data.configs && data.configs.length > 0) {
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(data.configs[0].vlessLink)}`;
+            document.getElementById('ucQrImg').src = qrUrl;
+          }
+
+          toast(`🟢 اکانت ${data.username} با موفقیت در سنایی ثبت گردید!`);
+
+        } else {
+          if (statusMsg) {
+            statusMsg.innerHTML = `<span style="color:var(--danger); font-weight:800;">🔴 خطا:</span> ${data.error || 'خطا در ثبت کاربر'}`;
+          }
+        }
+      } catch(e) {
+        if (statusMsg) {
+          statusMsg.innerHTML = `🔴 خطا در اتصال به API: ${e.message}`;
+        }
+      }
+    });
+  }
+
+  const btnCopyClientMessage = document.getElementById('btnCopyClientMessage');
+  if (btnCopyClientMessage) {
+    btnCopyClientMessage.addEventListener('click', () => {
+      if (lastUserClientMessage) {
+        navigator.clipboard.writeText(lastUserClientMessage).then(() => {
+          toast('💬 پیام آماده مشتری کپی شد!');
+        });
+      } else {
+        toast('لطفاً ابتدا اکانت کاربر را بسازید.');
+      }
+    });
   }
 
   // Logs

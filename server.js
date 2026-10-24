@@ -25,9 +25,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Default pre-configured values from user request
 const CONFIG_STORE = {
-  iranIPv4: process.env.DEFAULT_IRAN_IPV4 || '188.121.101.206',
+  iranIPv4: process.env.DEFAULT_IRAN_IPV4 || '95.38.191.217',
   iranIPv6: process.env.DEFAULT_IRAN_IPV6 || '2a07:3903:0:2::21c',
-  kharejIP: process.env.DEFAULT_KHAREJ_IP || '13.140.81.175',
+  iranDomain: process.env.DEFAULT_IRAN_DOMAIN || 'iran.limogame4.site',
+  kharejIP: process.env.DEFAULT_KHAREJ_IP || '13.140.87.14',
+  kharejDomain: process.env.DEFAULT_KHAREJ_DOMAIN || 'tunnel.limogame4.site',
   tunnelPort: 4443,
   targetPort: 2500, // Destination on Kharej (e.g. Xray/3x-ui inbound)
   clientPort: 9000, // Listen port on Iran for users/v2ray
@@ -1341,6 +1343,130 @@ app.post('/api/sanaei/create-multi-inbounds', async (req, res) => {
     connectionError,
     tunnels: results,
     subscriptionBase64: combinedSubBase64
+  });
+});
+
+/**
+ * Add a New Client User across all 7/5 Tunnels in Sanaei Panel
+ * Generates client UUID, adds to Sanaei inbounds, and returns tunneled VLESS URIs on Iran Domain/IP
+ */
+app.post('/api/sanaei/add-user', async (req, res) => {
+  const {
+    username = `user_${Math.floor(1000 + Math.random() * 9000)}`,
+    expiryDays = 30,
+    totalGB = 50,
+    iranHost = CONFIG_STORE.iranDomain || CONFIG_STORE.iranIPv4,
+    host = CONFIG_STORE.kharejIP,
+    port = 53008,
+    basePath = 'WTy9cJKmxOphyIW78A',
+    apiToken = 'PS9j4s3FcPs5Jd4dvotYep7KVHdRwBclabkPRCqEMZjBQQxs'
+  } = req.body;
+
+  const cleanUsername = username.trim().replace(/[^a-zA-Z0-9_-]/g, '_');
+  const uuid = crypto.randomUUID();
+  const totalBytes = parseInt(totalGB, 10) * 1024 * 1024 * 1024;
+  const expiryTime = Date.now() + parseInt(expiryDays, 10) * 24 * 3600 * 1000;
+  const cleanBasePath = basePath ? (basePath.startsWith('/') ? basePath : '/' + basePath) : '';
+
+  let activeCookie = await resolveSanaeiCookie(req.body);
+  let addedToRemoteCount = 0;
+  let remoteError = null;
+
+  if (activeCookie) {
+    try {
+      // 1. Fetch inbounds list from Sanaei
+      const listUrl = `http://${host}:${port}${cleanBasePath}/panel/api/inbounds/list`;
+      const listRes = await fetch(listUrl, {
+        headers: getSanaeiHeaders(req.body, activeCookie),
+        signal: AbortSignal.timeout(3500)
+      });
+      const listData = await listRes.json().catch(() => ({}));
+
+      if (listData.success && Array.isArray(listData.obj)) {
+        // 2. Add client user to each inbound matching ports 2500..2506
+        for (const inbound of listData.obj) {
+          try {
+            const addClientUrl = `http://${host}:${port}${cleanBasePath}/panel/api/inbounds/addClient`;
+            const clientPayload = {
+              id: inbound.id,
+              settings: JSON.stringify({
+                clients: [{
+                  id: uuid,
+                  flow: '',
+                  email: `${cleanUsername}_${inbound.port}`,
+                  limitIp: 0,
+                  totalGB: totalBytes,
+                  expiryTime: expiryTime,
+                  enable: true,
+                  tgId: '',
+                  subId: ''
+                }]
+              })
+            };
+
+            const addClientRes = await fetch(addClientUrl, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                ...getSanaeiHeaders(req.body, activeCookie)
+              },
+              body: JSON.stringify(clientPayload),
+              signal: AbortSignal.timeout(3000)
+            });
+            const addClientData = await addClientRes.json().catch(() => ({}));
+            if (addClientData.success) {
+              addedToRemoteCount++;
+            }
+          } catch (e) {}
+        }
+      }
+    } catch (err) {
+      remoteError = err.message;
+    }
+  }
+
+  // 3. Construct the 7 tunneled VLESS links pointing to Iran Host (Domain/IP)
+  const configs = TUNNEL_PRESETS.map(t => {
+    const vlessLink = `vless://${uuid}@${iranHost}:${t.iranPort}?encryption=none&security=none&type=tcp#${encodeURIComponent(`${cleanUsername} - ${t.shortName}`)}`;
+    return {
+      id: t.id,
+      shortName: t.shortName,
+      iranPort: t.iranPort,
+      inboundPort: t.targetPort,
+      vlessLink,
+      description: t.description
+    };
+  });
+
+  const vlessList = configs.map(c => c.vlessLink);
+  const subscriptionBase64 = Buffer.from(vlessList.join('\n')).toString('base64');
+
+  const formattedClientMessage = `🛡️ اکانت اختصاصی ۷-تانله و ضد فیلترینگ شما آماده است:
+
+👤 نام کاربری: ${cleanUsername}
+📊 حجم اختصاصی: ${totalGB} گیگابایت
+⏱️ اعتبار: ${expiryDays} روز
+
+🌐 لینک اتصال گروهی (Subscription Link):
+${subscriptionBase64}
+
+📱 نحوه استفاده:
+۱) لینک فوق را کپی کنید.
+۲) در نرم‌افزار v2rayNG (اندروید)، Streisand/V2Box (آیفون) یا Nekoray/V2RayN (ویندوز)، از منوی Subscription آن را وارد نمایید.
+۳) دکمه بروزرسانی (Update Subscriptions) را بزنید تا هر ۷ کانال تانل‌شده سرور ایران ظاهر شوند.`;
+
+  res.json({
+    ok: true,
+    username: cleanUsername,
+    uuid,
+    expiryDays,
+    totalGB,
+    iranHost,
+    addedToRemoteCount,
+    remoteError,
+    configs,
+    subscriptionBase64,
+    formattedClientMessage
   });
 });
 
