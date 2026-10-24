@@ -1243,6 +1243,49 @@
         </div>
       </div>
 
+      <!-- Native Web Management Interface for Pahlavi Slots -->
+      <div class="card-clean" style="margin-bottom:22px;">
+        <div class="card-head">
+          <div class="card-title-text"><span class="bullet"></span>مدیریت مستقیم اسلات‌های تانل پهلوی در همین پنل (Web Slot Manager)</div>
+          <button class="btn btn-solid btn-sm" id="btnSavePahlaviSlots" style="background:#d97706; border-color:#d97706;">
+            💾 ذخیره و اعمال تغییرات اسلات‌ها
+          </button>
+        </div>
+        <div class="card-body">
+          <div class="grid-2" style="margin-bottom:14px;">
+            <div>
+              <label class="field-lbl">پورت Bridge (اتصال اصلی):</label>
+              <input class="inp-clean" id="pahlaviBridgePort" value="10000" type="number">
+            </div>
+            <div>
+              <label class="field-lbl">پورت Sync (همگام‌سازی):</label>
+              <input class="inp-clean" id="pahlaviSyncPort" value="10001" type="number">
+            </div>
+          </div>
+
+          <div style="font-weight:800; font-size:13.5px; color:var(--ink); margin-bottom:10px;">
+            جدول ۱۰ اسلات تانل پهلوی (هدایت پورت‌های ایران به پورت‌های اینباند سنایی در سرور خارج):
+          </div>
+
+          <div class="sanaei-table-wrap">
+            <table class="sanaei-table">
+              <thead>
+                <tr>
+                  <th>اسلات (Slot)</th>
+                  <th>عنوان تانل</th>
+                  <th>پورت ورودی ایران</th>
+                  <th>پورت سنایی (خارج)</th>
+                  <th>وضعیت</th>
+                </tr>
+              </thead>
+              <tbody id="pahlaviSlotsTableBody">
+                <!-- Slot rows injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
       <!-- Feature Details Card -->
       <div class="grid-2">
         <div class="card-clean">
@@ -3294,6 +3337,95 @@ ${sub}
     });
   }
 
+  // Pahlavi Slot Manager JS
+  let activePahlaviSlots = [];
+
+  async function loadPahlaviSlots() {
+    try {
+      const res = await fetch('/api/pahlavi/slots');
+      const data = await res.json();
+      if (data.ok && data.config) {
+        if (document.getElementById('pahlaviBridgePort')) {
+          document.getElementById('pahlaviBridgePort').value = data.config.bridgePort || 10000;
+        }
+        if (document.getElementById('pahlaviSyncPort')) {
+          document.getElementById('pahlaviSyncPort').value = data.config.syncPort || 10001;
+        }
+        activePahlaviSlots = data.config.slots || [];
+        renderPahlaviSlotsTable(activePahlaviSlots);
+      }
+    } catch(e) {}
+  }
+
+  function renderPahlaviSlotsTable(slots) {
+    const tbody = document.getElementById('pahlaviSlotsTableBody');
+    if (!tbody) return;
+
+    if (!slots || slots.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">اسلاتی ثبت نشده است.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = slots.map((s, idx) => `
+      <tr>
+        <td class="mono" style="font-weight:800;">Slot #${s.id || (idx + 1)}</td>
+        <td>
+          <input class="inp-clean ps-name" data-id="${s.id}" value="${s.name || `تانل ${idx+1}`}" style="font-size:12px; padding:4px 8px; width:180px;">
+        </td>
+        <td>
+          <input class="inp-clean ps-iran-port" data-id="${s.id}" value="${s.iranPort || (9000 + idx)}" type="number" style="font-size:12px; padding:4px 8px; width:110px;">
+        </td>
+        <td>
+          <input class="inp-clean ps-kharej-port" data-id="${s.id}" value="${s.kharejPort || (2500 + idx)}" type="number" style="font-size:12px; padding:4px 8px; width:110px;">
+        </td>
+        <td>
+          <span class="status-pill status-pill-active">فعال و آماده</span>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  async function savePahlaviSlots() {
+    const bridgePort = document.getElementById('pahlaviBridgePort') ? document.getElementById('pahlaviBridgePort').value.trim() : 10000;
+    const syncPort = document.getElementById('pahlaviSyncPort') ? document.getElementById('pahlaviSyncPort').value.trim() : 10001;
+
+    const names = document.querySelectorAll('.ps-name');
+    const iranPorts = document.querySelectorAll('.ps-iran-port');
+    const kharejPorts = document.querySelectorAll('.ps-kharej-port');
+
+    const updatedSlots = [];
+    names.forEach((el, idx) => {
+      const id = parseInt(el.getAttribute('data-id') || (idx + 1), 10);
+      const name = el.value.trim();
+      const iranPort = parseInt(iranPorts[idx].value.trim(), 10);
+      const kharejPort = parseInt(kharejPorts[idx].value.trim(), 10);
+      updatedSlots.push({ id, name, iranPort, kharejPort, enable: true });
+    });
+
+    toast('⏳ در حال ذخیره و اعمال تغییرات اسلات‌های تانل پهلوی...');
+
+    try {
+      const res = await fetch('/api/pahlavi/slots', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slots: updatedSlots, bridgePort, syncPort })
+      });
+      const data = await res.json();
+      if (data.ok) {
+        toast('🟢 اسلات‌های تانل پهلوی با موفقیت ذخیره و در دیتابیس اعمال شدند!');
+      } else {
+        toast(`🔴 خطا: ${data.error}`);
+      }
+    } catch(e) {
+      toast(`🔴 خطا در ذخیره: ${e.message}`);
+    }
+  }
+
+  const btnSavePahlaviSlots = document.getElementById('btnSavePahlaviSlots');
+  if (btnSavePahlaviSlots) {
+    btnSavePahlaviSlots.addEventListener('click', savePahlaviSlots);
+  }
+
   // Logs
   async function loadLogs() {
     try {
@@ -3337,6 +3469,7 @@ ${sub}
   window.addEventListener('DOMContentLoaded', () => {
     syncGlobalIPs();
     loadLogs();
+    loadPahlaviSlots();
   });
 </script>
 </body>

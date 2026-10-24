@@ -1801,11 +1801,11 @@ app.post('/api/panel/host-action', async (req, res) => {
   } else if (action === 'status_tunnels') {
     cmd = 'systemctl status t2tunnel.service --no-pager';
   } else if (action === 'install_pahlavi_kharej') {
-    cmd = `sudo bash ${path.join(__dirname, 'install-pahlavi-kharej.sh')} || bash <(curl -Ls https://raw.githubusercontent.com/Zehnovik/Pahlavi-tunnel/main/install.sh)`;
+    cmd = `sudo bash ${path.join(__dirname, 'install-pahlavi-kharej.sh')}`;
   } else if (action === 'install_pahlavi_iran') {
-    cmd = `sudo bash ${path.join(__dirname, 'install-pahlavi-iran.sh')} || bash <(curl -Ls https://raw.githubusercontent.com/Zehnovik/Pahlavi-tunnel/main/install.sh)`;
+    cmd = `sudo bash ${path.join(__dirname, 'install-pahlavi-iran.sh')}`;
   } else if (action === 'status_pahlavi') {
-    cmd = 'systemctl status pahlavi-tunnel --no-pager || pahlavi-tunnel status || journalctl -u pahlavi-tunnel -n 25 --no-pager';
+    cmd = 'systemctl status pahlavi-tunnel --no-pager || journalctl -u pahlavi-tunnel -n 25 --no-pager';
   } else if (action === 'update_panel') {
     cmd = 'cd /opt/mhtunnel-panel && git pull && systemctl restart mhtunnel-panel.service || curl -sSL http://localhost:3000/install-panel.sh | bash';
   } else if (action === 'restart_panel') {
@@ -1823,6 +1823,74 @@ app.post('/api/panel/host-action', async (req, res) => {
     return res.json({ ok: true, action, output: stdout || stderr || 'دستور با موفقیت در سرور اجرا شد.' });
   } catch (err) {
     return res.json({ ok: false, action, output: err.stdout || err.stderr || err.message });
+  }
+});
+
+// Native Pahlavi-tunnel Slot Management API
+const PAHLAVI_CONFIG_FILE = '/opt/pahlavi-tunnel/config.json';
+
+app.get('/api/pahlavi/slots', (req, res) => {
+  let pahlaviConfig = {
+    role: 'kharej',
+    kharejIP: CONFIG_STORE.kharejIP,
+    iranIP: CONFIG_STORE.iranIPv4,
+    bridgePort: 10000,
+    syncPort: 10001,
+    slots: [
+      { id: 1, name: 'REALITY Quantum', iranPort: 9000, kharejPort: 2500, enable: true },
+      { id: 2, name: 'WebSocket CDN', iranPort: 9001, kharejPort: 2501, enable: true },
+      { id: 3, name: 'gRPC MultiStream', iranPort: 9002, kharejPort: 2502, enable: true },
+      { id: 4, name: 'FakeTCP Raw IP', iranPort: 9003, kharejPort: 2503, enable: true },
+      { id: 5, name: 'IPv6 Direct Peering', iranPort: 9004, kharejPort: 2504, enable: true },
+      { id: 6, name: 'Reverse Intranet Bridge', iranPort: 9005, kharejPort: 2505, enable: true },
+      { id: 7, name: 'Access-IP Whitelist Bypass', iranPort: 9006, kharejPort: 2506, enable: true }
+    ]
+  };
+
+  try {
+    if (fs.existsSync(PAHLAVI_CONFIG_FILE)) {
+      const fileData = fs.readFileSync(PAHLAVI_CONFIG_FILE, 'utf-8');
+      pahlaviConfig = JSON.parse(fileData);
+    }
+  } catch(e) {}
+
+  res.json({ ok: true, config: pahlaviConfig });
+});
+
+app.post('/api/pahlavi/slots', async (req, res) => {
+  const { slots, bridgePort = 10000, syncPort = 10001, role = 'kharej' } = req.body;
+  if (!Array.isArray(slots)) {
+    return res.status(400).json({ ok: false, error: 'لیست اسلات‌ها باید آرایه باشد' });
+  }
+
+  const pahlaviConfig = {
+    role,
+    kharejIP: CONFIG_STORE.kharejIP,
+    iranIP: CONFIG_STORE.iranIPv4,
+    bridgePort: parseInt(bridgePort, 10),
+    syncPort: parseInt(syncPort, 10),
+    slots
+  };
+
+  try {
+    fs.mkdirSync('/opt/pahlavi-tunnel', { recursive: true });
+    fs.writeFileSync(PAHLAVI_CONFIG_FILE, JSON.stringify(pahlaviConfig, null, 2), 'utf-8');
+
+    let restarted = false;
+    try {
+      await execPromise('systemctl restart pahlavi-tunnel.service || true');
+      restarted = true;
+    } catch(e) {}
+
+    addLog(`[PAHLAVI API] Saved ${slots.length} slots to ${PAHLAVI_CONFIG_FILE}`);
+    return res.json({
+      ok: true,
+      message: 'تنظیمات اسلات‌های تانل پهلوی با موفقیت در دیتابیس ذخیره و اِعمال شدند.',
+      restarted,
+      config: pahlaviConfig
+    });
+  } catch(err) {
+    return res.status(500).json({ ok: false, error: `خطا در ذخیره فایل تنظیمات پهلوی: ${err.message}` });
   }
 });
 
