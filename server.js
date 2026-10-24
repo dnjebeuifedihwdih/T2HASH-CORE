@@ -1525,6 +1525,8 @@ app.post('/api/panel/host-action', async (req, res) => {
   if (action === 'install_tunnels') {
     const scriptFile = role === 'iran' ? 'install-iran.sh' : 'install-kharej.sh';
     cmd = `sudo bash ${path.join(__dirname, scriptFile)}`;
+  } else if (action === 'update_panel') {
+    cmd = 'cd /opt/mhtunnel-panel && git pull && systemctl restart mhtunnel-panel.service || curl -sSL http://localhost:3000/install-panel.sh | bash';
   } else if (action === 'restart_panel') {
     cmd = 'sudo systemctl restart mhtunnel-panel.service';
   } else if (action === 'status_panel') {
@@ -1541,6 +1543,56 @@ app.post('/api/panel/host-action', async (req, res) => {
   } catch (err) {
     return res.json({ ok: false, action, output: err.stdout || err.stderr || err.message });
   }
+});
+
+/**
+ * Real Live Socket Status Test specifically for Iran Server IP
+ */
+app.post('/api/test-iran-server', async (req, res) => {
+  const iranIP = (req.body.iranIP || req.body.ip || CONFIG_STORE.iranIPv4).trim();
+  addLog(`[IRAN PROBE] Probing real live TCP connectivity to Iran Server IP: ${iranIP}...`);
+
+  const portsToTest = [
+    { port: 9000, name: 'TLS Quantum (پورت ۹۰۰۰)' },
+    { port: 9001, name: 'WebSocket CDN (پورت ۹۰۰۱)' },
+    { port: 9002, name: 'gRPC Multiplex (پورت ۹۰۰۲)' },
+    { port: 9005, name: 'Reverse Intranet Bridge (پورت ۹۰۰۵)' },
+    { port: 22, name: 'SSH (پورت ۲۲)' }
+  ];
+
+  const results = await Promise.all(portsToTest.map(async (p) => {
+    const probe = await testTcpSocket(iranIP, p.port, 2500);
+    return {
+      port: p.port,
+      name: p.name,
+      reachable: probe.reachable,
+      latencyMs: probe.latencyMs,
+      error: probe.error,
+      message: probe.message
+    };
+  }));
+
+  const activePorts = results.filter(r => r.reachable);
+  const isServerReachable = activePorts.length > 0;
+  const bestLatency = activePorts.length > 0 ? Math.min(...activePorts.map(a => a.latencyMs)) : null;
+
+  let message = '';
+  if (isServerReachable) {
+    message = `🟢 سرور ایران (${iranIP}) فعال است. تعداد ${activePorts.length} پورت تانل و سرویس‌پاسخگو هستند (کمترین تاخیر: ${bestLatency}ms).`;
+  } else {
+    message = `🔴 سرور ایران (${iranIP}) در دسترس نیست یا پورت‌های تانل هنوز اجرا نشده‌اند (تایم‌اوت شبکه).`;
+  }
+
+  res.json({
+    ok: true,
+    iranIP,
+    reachable: isServerReachable,
+    activePortsCount: activePorts.length,
+    bestLatency,
+    message,
+    ports: results,
+    verifiedAt: new Date().toLocaleTimeString('fa-IR')
+  });
 });
 
 app.post('/api/action', (req, res) => {

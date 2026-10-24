@@ -904,6 +904,9 @@
       <div style="font-size:11.5px; color:var(--ink-muted); text-align:center;" id="sidebarIpSummary">
         ایران: 188.121.101.206 ⇄ خارج: 13.140.81.175
       </div>
+      <button class="btn btn-solid btn-sm" id="sidebarUpdatePanelBtn" style="width:100%; background:#16a34a; border-color:#16a34a; margin-top:4px;">
+        🔄 بروزرسانی و آپدیت پنل
+      </button>
     </div>
   </aside>
 
@@ -943,6 +946,39 @@
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
             اعمال و بازتولید همه اسکریپت‌ها
           </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====================================================================
+         IRAN SERVER CONNECTIVITY STATUS & PANEL UPDATE CONTROL CARD
+         ==================================================================== -->
+    <div style="background: #ffffff; border: 2px solid #2563eb; border-radius: var(--r); padding: 18px 22px; margin-bottom: 24px; box-shadow: var(--shadow-md);">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 10px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">
+        <div style="font-size: 15px; font-weight: 900; color: #0f172a; display: flex; align-items: center; gap: 8px;">
+          <span style="display: inline-block; width: 10px; height: 10px; background: #10b981; border-radius: 50%; box-shadow: 0 0 8px rgba(16, 185, 129, 0.8);"></span>
+          وضعیت واقعی ارتباط با سرور ایران و بروزرسانی پنل
+        </div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <button class="btn btn-accent btn-sm" id="btnTestIranConn">
+            ⚡ استعلام زنده وضعیت سرور ایران (<span class="mono" id="btnIranIpLabel">188.121.101.206</span>)
+          </button>
+          <button class="btn btn-solid btn-sm" id="btnUpdatePanelTop" style="background: #16a34a; border-color: #16a34a;">
+            🔄 بروزرسانی و آپدیت آنلاین پنل (Update Panel)
+          </button>
+        </div>
+      </div>
+
+      <div id="iranStatusResultBox" class="hide" style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 14px; margin-top: 10px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <div style="font-size: 13.5px; font-weight: 800; color: #0f172a;" id="iranStatusHeader">پاسخ تست زنده سوکت TCP سرور ایران</div>
+          <span class="mono" style="font-size: 11px; color: #64748b;" id="iranStatusTime">--:--:--</span>
+        </div>
+        <div style="font-size: 12.5px; color: #334155; margin-bottom: 10px;" id="iranStatusSummaryText">
+          در حال لایو تست اتصال شبکه به سرور ایران...
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px;" id="iranPortsGrid">
+          <!-- Live Port badges will be injected here -->
         </div>
       </div>
     </div>
@@ -2784,6 +2820,74 @@ ${sub}
       if (out) out.textContent = `[ERROR] عدم امکان ارتباط با سرور: ${e.message}`;
       toast('خطا در ارتباط با سرور');
     }
+  }
+
+  // Live Iran Server Connectivity Tester
+  async function testIranServerConn() {
+    const box = document.getElementById('iranStatusResultBox');
+    const summaryText = document.getElementById('iranStatusSummaryText');
+    const portsGrid = document.getElementById('iranPortsGrid');
+    const timeSpan = document.getElementById('iranStatusTime');
+    const btnLabel = document.getElementById('btnIranIpLabel');
+
+    if (btnLabel) btnLabel.textContent = activeIranIP;
+    if (box) box.classList.remove('hide');
+    if (summaryText) summaryText.textContent = `⏳ در حال تست زنده سوکت‌های TCP سرور ایران (${activeIranIP})...`;
+    if (portsGrid) portsGrid.innerHTML = '<div style="font-size:12px; color:#64748b;">ارسال درخواست به پورت‌ها...</div>';
+
+    try {
+      const res = await fetch('/api/test-iran-server', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ iranIP: activeIranIP })
+      });
+      const data = await res.json();
+      if (timeSpan) timeSpan.textContent = data.verifiedAt || new Date().toLocaleTimeString('fa-IR');
+
+      if (data.ok) {
+        if (summaryText) summaryText.innerHTML = `<span style="font-weight:700;">${data.message}</span>`;
+        if (portsGrid && Array.isArray(data.ports)) {
+          portsGrid.innerHTML = data.ports.map(p => `
+            <div style="background:${p.reachable ? '#ecfdf5' : '#fef2f2'}; border:1px solid ${p.reachable ? '#a7f3d0' : '#fecaca'}; padding:8px 10px; border-radius:6px; font-size:12px;">
+              <div style="font-weight:700; color:${p.reachable ? '#065f46' : '#991b1b'}; display:flex; justify-content:space-between;">
+                <span>${p.name}</span>
+                <span>${p.reachable ? '🟢 وصل' : '🔴 قطعی'}</span>
+              </div>
+              <div class="mono" style="font-size:11px; margin-top:2px; color:${p.reachable ? '#047857' : '#b91c1c'};">
+                ${p.reachable ? `پینگ: ${p.latencyMs}ms` : p.message}
+              </div>
+            </div>
+          `).join('');
+        }
+        toast(data.reachable ? `🟢 سرور ایران ${activeIranIP} فعال است` : `🔴 سرور ایران ${activeIranIP} پاسخگو نیست`);
+      } else {
+        if (summaryText) summaryText.textContent = `🔴 خطا در تست: ${data.error || 'عدم دریافت پاسخ'}`;
+      }
+    } catch(e) {
+      if (summaryText) summaryText.textContent = `🔴 خطا در ارتباط با سرور: ${e.message}`;
+    }
+  }
+
+  // Update Panel Trigger
+  async function updatePanelNow() {
+    toast('🔄 درخواست آپدیت پنل رو سرور ارسال شد...');
+    await runHostAction('update_panel', 'kharej');
+  }
+
+  // Event Listeners for Iran Test and Update Panel
+  const btnTestIranConn = document.getElementById('btnTestIranConn');
+  if (btnTestIranConn) {
+    btnTestIranConn.addEventListener('click', testIranServerConn);
+  }
+
+  const btnUpdatePanelTop = document.getElementById('btnUpdatePanelTop');
+  if (btnUpdatePanelTop) {
+    btnUpdatePanelTop.addEventListener('click', updatePanelNow);
+  }
+
+  const sidebarUpdatePanelBtn = document.getElementById('sidebarUpdatePanelBtn');
+  if (sidebarUpdatePanelBtn) {
+    sidebarUpdatePanelBtn.addEventListener('click', updatePanelNow);
   }
 
   // Logs
