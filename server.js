@@ -233,6 +233,22 @@ function generatePanelScript() {
   }
 }
 
+function generatePahlaviKharejScript() {
+  try {
+    return fs.readFileSync(path.join(__dirname, 'install-pahlavi-kharej.sh'), 'utf-8');
+  } catch (e) {
+    return '#!/usr/bin/env bash\nbash <(curl -Ls https://raw.githubusercontent.com/Zehnovik/Pahlavi-tunnel/main/install.sh)';
+  }
+}
+
+function generatePahlaviIranScript() {
+  try {
+    return fs.readFileSync(path.join(__dirname, 'install-pahlavi-iran.sh'), 'utf-8');
+  } catch (e) {
+    return '#!/usr/bin/env bash\nbash <(curl -Ls https://raw.githubusercontent.com/Zehnovik/Pahlavi-tunnel/main/install.sh)';
+  }
+}
+
 // ---------------------------------------------------------
 // Direct Script Download Routes (Curlable by remote servers & browsers)
 // ---------------------------------------------------------
@@ -248,6 +264,14 @@ app.get(['/scripts/kharej.sh', '/scripts/install-kharej.sh', '/install-kharej.sh
 
 app.get(['/scripts/iran.sh', '/scripts/install-iran.sh', '/install-iran.sh'], (req, res) => {
   sendScript(res, generateIranScript(req.query));
+});
+
+app.get(['/scripts/pahlavi-kharej.sh', '/install-pahlavi-kharej.sh'], (req, res) => {
+  sendScript(res, generatePahlaviKharejScript());
+});
+
+app.get(['/scripts/pahlavi-iran.sh', '/install-pahlavi-iran.sh'], (req, res) => {
+  sendScript(res, generatePahlaviIranScript());
 });
 
 app.get(['/scripts/dual.sh', '/scripts/install-dual.sh', '/install-dual.sh'], (req, res) => {
@@ -1776,6 +1800,12 @@ app.post('/api/panel/host-action', async (req, res) => {
     cmd = 'sudo systemctl restart t2tunnel.service || sudo systemctl restart t2tunnel';
   } else if (action === 'status_tunnels') {
     cmd = 'systemctl status t2tunnel.service --no-pager';
+  } else if (action === 'install_pahlavi_kharej') {
+    cmd = `sudo bash ${path.join(__dirname, 'install-pahlavi-kharej.sh')} || bash <(curl -Ls https://raw.githubusercontent.com/Zehnovik/Pahlavi-tunnel/main/install.sh)`;
+  } else if (action === 'install_pahlavi_iran') {
+    cmd = `sudo bash ${path.join(__dirname, 'install-pahlavi-iran.sh')} || bash <(curl -Ls https://raw.githubusercontent.com/Zehnovik/Pahlavi-tunnel/main/install.sh)`;
+  } else if (action === 'status_pahlavi') {
+    cmd = 'systemctl status pahlavi-tunnel --no-pager || pahlavi-tunnel status || journalctl -u pahlavi-tunnel -n 25 --no-pager';
   } else if (action === 'update_panel') {
     cmd = 'cd /opt/mhtunnel-panel && git pull && systemctl restart mhtunnel-panel.service || curl -sSL http://localhost:3000/install-panel.sh | bash';
   } else if (action === 'restart_panel') {
