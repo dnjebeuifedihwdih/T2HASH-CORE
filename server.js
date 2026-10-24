@@ -1212,6 +1212,32 @@ app.post('/api/sanaei/create-inbound', async (req, res) => {
   });
 });
 
+// Helper to construct exact VLESS link matching Sanaei inbound streamSettings (ws, grpc, tcp, etc.)
+function buildDynamicVlessLink({ uuid, host, port, tag, inboundObj }) {
+  let type = 'tcp';
+  let path = '';
+  let serviceName = '';
+  let security = 'none';
+
+  if (inboundObj) {
+    try {
+      const stream = typeof inboundObj.streamSettings === 'string' ? JSON.parse(inboundObj.streamSettings) : inboundObj.streamSettings;
+      if (stream) {
+        if (stream.network) type = stream.network;
+        if (stream.security && stream.security !== 'none') security = stream.security;
+        if (stream.wsSettings && stream.wsSettings.path) path = stream.wsSettings.path;
+        if (stream.grpcSettings && stream.grpcSettings.serviceName) serviceName = stream.grpcSettings.serviceName;
+      }
+    } catch(e) {}
+  }
+
+  let params = `encryption=none&security=${security}&type=${type}`;
+  if (type === 'ws' && path) params += `&path=${encodeURIComponent(path)}`;
+  if (type === 'grpc' && serviceName) params += `&serviceName=${encodeURIComponent(serviceName)}&mode=gun`;
+
+  return `vless://${uuid}@${host}:${port}?${params}#${encodeURIComponent(tag)}`;
+}
+
 // Auto-create all 5 inbounds in Sanaei and return 5 VLESS links + 1 unified subscription
 app.post('/api/sanaei/create-multi-inbounds', async (req, res) => {
   const activeIranIP = req.body.iranIPv4 || req.body.iranIP || CONFIG_STORE.iranIPv4;
@@ -1253,15 +1279,16 @@ app.post('/api/sanaei/create-multi-inbounds', async (req, res) => {
   for (const t of TUNNEL_PRESETS) {
     let uuid = crypto.randomUUID();
     let createdOnRemote = false;
+    let matchedInboundObj = null;
 
     // Check if inbound already exists on targetPort in Sanaei
     if (existingInboundsMap.has(t.targetPort)) {
       createdOnRemote = true;
       remoteCreatedCount++;
-      const existingIb = existingInboundsMap.get(t.targetPort);
-      // Try extracting existing client UUID from Sanaei settings
+      matchedInboundObj = existingInboundsMap.get(t.targetPort);
+      // Extract existing client UUID from Sanaei settings if available
       try {
-        const settings = typeof existingIb.settings === 'string' ? JSON.parse(existingIb.settings) : existingIb.settings;
+        const settings = typeof matchedInboundObj.settings === 'string' ? JSON.parse(matchedInboundObj.settings) : matchedInboundObj.settings;
         if (settings && Array.isArray(settings.clients) && settings.clients.length > 0 && settings.clients[0].id) {
           uuid = settings.clients[0].id;
         }
@@ -1277,7 +1304,7 @@ app.post('/api/sanaei/create-multi-inbounds', async (req, res) => {
           remark: t.name.slice(0, 30),
           enable: true,
           expiryTime: 0,
-          listen: '127.0.0.1',
+          listen: '0.0.0.0',
           port: t.targetPort,
           protocol: 'vless',
           settings: JSON.stringify({
@@ -1306,7 +1333,13 @@ app.post('/api/sanaei/create-multi-inbounds', async (req, res) => {
       } catch (e) {}
     }
 
-    const vlessLink = `vless://${uuid}@${activeIranIP}:${t.iranPort}?encryption=none&security=none&type=tcp#${encodeURIComponent(t.shortName)}`;
+    const vlessLink = buildDynamicVlessLink({
+      uuid,
+      host: activeIranIP,
+      port: t.iranPort,
+      tag: t.shortName,
+      inboundObj: matchedInboundObj
+    });
     vlessLinksList.push(vlessLink);
 
     results.push({
@@ -1372,6 +1405,8 @@ app.post('/api/sanaei/add-user', async (req, res) => {
   let addedToRemoteCount = 0;
   let remoteError = null;
 
+  let existingInboundsMap = new Map();
+
   if (activeCookie) {
     try {
       // 1. Fetch inbounds list from Sanaei
@@ -1383,6 +1418,8 @@ app.post('/api/sanaei/add-user', async (req, res) => {
       const listData = await listRes.json().catch(() => ({}));
 
       if (listData.success && Array.isArray(listData.obj)) {
+        listData.obj.forEach(ib => existingInboundsMap.set(ib.port, ib));
+
         // 2. Add client user to each inbound matching ports 2500..2506
         for (const inbound of listData.obj) {
           try {
@@ -1427,7 +1464,15 @@ app.post('/api/sanaei/add-user', async (req, res) => {
 
   // 3. Construct the 7 tunneled VLESS links pointing to Iran Host (Domain/IP)
   const configs = TUNNEL_PRESETS.map(t => {
-    const vlessLink = `vless://${uuid}@${iranHost}:${t.iranPort}?encryption=none&security=none&type=tcp#${encodeURIComponent(`${cleanUsername} - ${t.shortName}`)}`;
+    const matchedInboundObj = existingInboundsMap.get(t.targetPort);
+    const vlessLink = buildDynamicVlessLink({
+      uuid,
+      host: iranHost,
+      port: t.iranPort,
+      tag: `${cleanUsername} - ${t.shortName}`,
+      inboundObj: matchedInboundObj
+    });
+
     return {
       id: t.id,
       shortName: t.shortName,
