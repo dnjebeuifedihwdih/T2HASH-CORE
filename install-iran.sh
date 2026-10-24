@@ -73,23 +73,29 @@ sysctl -p /etc/sysctl.d/99-t2tunnel.conf >/dev/null 2>&1 || true
 echo -e "${YELLOW}[2/6] 📦 Installing System Dependencies...${NC}"
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -y >/dev/null 2>&1 || true
-apt-get install -y -q libpcap-dev build-essential iptables curl tar git ufw socat >/dev/null 2>&1 || true
+apt-get install -y -q golang-go libpcap-dev build-essential iptables curl tar git ufw socat >/dev/null 2>&1 || true
 
 echo -e "${YELLOW}[3/6] 🐹 Setting up Go (Iran Sanction-Bypass Mirrors Enabled)...${NC}"
-if ! command -v go >/dev/null 2>&1 || [ "$(go version 2>/dev/null | grep -oE 'go[0-9]+' | sed 's/go//' || echo 0)" -lt 1 ]; then
+if ! command -v go >/dev/null 2>&1; then
   ARCH=$(uname -m)
   case "$ARCH" in
     x86_64) GOARCH="amd64" ;;
     aarch64) GOARCH="arm64" ;;
     *) GOARCH="amd64" ;;
   esac
-  echo -e "      Downloading Go for ${GOARCH} via mirror..."
-  curl -fsSL --connect-timeout 10 --retry 3 "https://golang.google.cn/dl/go1.22.5.linux-${GOARCH}.tar.gz" -o /tmp/go.tar.gz || \
-  curl -fsSL --connect-timeout 15 --retry 3 "https://go.dev/dl/go1.22.5.linux-${GOARCH}.tar.gz" -o /tmp/go.tar.gz
-  rm -rf /usr/local/go && tar -C /usr/local -xzf /tmp/go.tar.gz
+  echo -e "      Downloading Go compiler for ${GOARCH} via mirror..."
   rm -f /tmp/go.tar.gz
-  export PATH=$PATH:/usr/local/go/bin
-  ln -sf /usr/local/go/bin/go /usr/local/bin/go
+  curl -fsSL -L --connect-timeout 10 --retry 3 "https://golang.google.cn/dl/go1.22.5.linux-${GOARCH}.tar.gz" -o /tmp/go.tar.gz 2>/dev/null || \
+  curl -fsSL -L --connect-timeout 10 --retry 3 "https://mirrors.aliyun.com/golang/go1.22.5.linux-${GOARCH}.tar.gz" -o /tmp/go.tar.gz 2>/dev/null || \
+  curl -fsSL -L --connect-timeout 10 --retry 3 "https://dl.google.com/go/go1.22.5.linux-${GOARCH}.tar.gz" -o /tmp/go.tar.gz 2>/dev/null || \
+  curl -fsSL -L --connect-timeout 10 --retry 3 "https://storage.googleapis.com/golang/go1.22.5.linux-${GOARCH}.tar.gz" -o /tmp/go.tar.gz 2>/dev/null || true
+
+  if [ -s /tmp/go.tar.gz ]; then
+    rm -rf /usr/local/go && tar -C /usr/local -xzf /tmp/go.tar.gz
+    rm -f /tmp/go.tar.gz
+    export PATH=$PATH:/usr/local/go/bin
+    ln -sf /usr/local/go/bin/go /usr/local/bin/go 2>/dev/null || true
+  fi
 fi
 export PATH=$PATH:/usr/local/go/bin
 export GOPROXY="https://goproxy.cn,https://goproxy.io,https://proxy.golang.org,direct"
